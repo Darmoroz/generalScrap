@@ -4,9 +4,10 @@ import fs from 'fs';
 import { saveToJson } from '../../commonUtils/saveToJson.js';
 import { delay } from '../../commonUtils/delay.js';
 
-const fileName = 'benzgen.json';
 
-export async function downloadImages(products) {
+export async function downloadImages(productsObj) {
+  const categoryName = productsObj.category;
+  const products = productsObj.products;
   const totalResultNew = [];
   console.log('total products', products.length);
   for (let i = 0; i < products.length; i++) {
@@ -16,7 +17,12 @@ export async function downloadImages(products) {
     const newImageUrls = [];
     const newImageUrls1 = [];
 
-    const folderName = `./data/img/benzGen/${product.proizvoditel.toLowerCase()}`;
+    const folderNameCategory = `./data/img/${categoryName}`;
+    const folderName = `${folderNameCategory}/${product.proizvoditel.toLowerCase()}`;
+
+    if (!fs.existsSync(folderNameCategory)) {
+      fs.mkdirSync(folderNameCategory);
+    }
     if (!fs.existsSync(folderName)) {
       fs.mkdirSync(folderName);
     }
@@ -63,7 +69,10 @@ export async function downloadImages(products) {
       imageUrls: newImageUrls.join(','),
       imageUrls_1: newImageUrls1.join(','),
     });
-    await saveToJson('./data/', fileName, totalResultNew);
+    await saveToJson('./data/', `${categoryName}.json`, {
+      category: categoryName,
+      products: totalResultNew,
+    });
     await delay(1000);
   }
 }

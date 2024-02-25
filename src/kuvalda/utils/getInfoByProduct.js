@@ -70,7 +70,7 @@ export async function getInfoByProduct(url) {
           }, {})
         : null;
 
-    return { type, name, price, categories, description, images, ...techAtrObj, ...pkgAtrObj };
+    return { type, name, price, categories, description, images, ...techAtrObj, ...pkgAtrObj, url };
   } catch (error) {
     console.log('ByProduct', chalk.red(error));
   }

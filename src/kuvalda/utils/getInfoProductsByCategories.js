@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { saveToJson } from '../../commonUtils/saveToJson.js';
+import { saveToJs } from '../../commonUtils/saveToJs.js';
 import { getInfoByProduct } from './getInfoByProduct.js';
 
 export async function getInfoProductsByCategories(categories) {
@@ -13,7 +13,7 @@ export async function getInfoProductsByCategories(categories) {
       try {
         const productInfo = await getInfoByProduct(url);
         productsFullInfo.push(productInfo);
-        await saveToJson('./data/', `${category}.json`, productsFullInfo);
+        await saveToJs('./data/', `${category}`, { category, products: productsFullInfo });
         console.log('product->', j, '\\', products.length);
       } catch (error) {
         console.log('InfoByProducts', chalk.red(error));
