@@ -1,4 +1,7 @@
-import { normalizeStr } from '../../commonUtils/normalizeStr';
+import axios from 'axios';
+import { JSDOM } from 'jsdom';
+import { slugify } from 'transliteration';
+import { normalizeStr } from '../../commonUtils/normalizeStr.js';
 
 export async function getInfoByProduct(url) {
   try {
@@ -33,6 +36,41 @@ export async function getInfoByProduct(url) {
 
     const imagesEl = [...document.querySelectorAll('.product-gallery__slider button img')];
     const images = imagesEl.length > 0 ? imagesEl.map(image => image.src) : null;
+
+    const techAtributeElArr = [
+      ...document.querySelectorAll('.product-specs__characteristics-item'),
+    ];
+    const pkgAtributeElArr = [...document.querySelectorAll('.product-specs__package-item')];
+
+    const techAtrObj =
+      techAtributeElArr.length > 0
+        ? techAtributeElArr.reduce((acc, curr) => {
+            const key = slugify(normalizeStr(curr.querySelector(':first-child')?.textContent), {
+              lowercase: true,
+              separator: '_',
+            });
+            const value = normalizeStr(curr.querySelector(':last-child')?.textContent);
+            acc[key] = value;
+            return acc;
+          }, {})
+        : null;
+
+    const pkgAtrObj =
+      pkgAtributeElArr.length > 0
+        ? pkgAtributeElArr.reduce((acc, curr) => {
+            const key = slugify(
+              normalizeStr(curr.querySelector('.product-specs__package-label')?.textContent),
+              { lowercase: true, separator: '_' }
+            );
+            const value = normalizeStr(
+              curr.querySelector('.product-specs__package-value')?.textContent
+            );
+            acc[`pkg_${key}`] = value;
+            return acc;
+          }, {})
+        : null;
+
+    return { type, name, price, categories, description, images, ...techAtrObj, ...pkgAtrObj };
   } catch (error) {
     console.log('ByProduct', chalk.red(error));
   }
