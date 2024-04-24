@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import { slugify } from 'transliteration';
 import { delay } from '../commonUtils/delay.js';
 import { saveToJson } from '../commonUtils/saveToJson.js';
-import { parseJSONFile } from './parseJSONFile.js';
+import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 // todo
 // const RES = [];
 // async function getAtlFirst() {
