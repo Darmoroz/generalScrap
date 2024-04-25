@@ -7,46 +7,6 @@ import { saveToJson } from '../commonUtils/saveToJson.js';
 import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 // todo
 // const RES = [];
-// async function getAtlFirst() {
-// 	for (let idx = 2; idx < 86; idx++) {
-// 		try {
-//     const response = await fetch(
-//       `https://atl.ua/ua/avtohimiya/masla/motornye/page-${idx}?brand=mazda-brand,mitsubishi-brand,vag,subaru-brand,mobis,motul,bmw-brand,nissan-brand,aral,toyota-brand,elf,ford-brand,general-motors,mercedes-benz-brand,prista-oil,total,honda-brand,shell,mobil,castrol,liqui-moly,hyundaikia&emkosttary=1l,4l,41l,5l,20l,60l,2l,0946l`,
-//       {
-//         headers: {
-//           accept: 'application/json, text/plain, */*',
-//           'accept-language': 'ua',
-//           'cache-control': 'no-cache',
-//           pragma: 'no-cache',
-//           priority: 'u=1, i',
-//           'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-//           'sec-ch-ua-mobile': '?0',
-//           'sec-ch-ua-platform': '"Windows"',
-//           'sec-fetch-dest': 'empty',
-//           'sec-fetch-mode': 'cors',
-//           'sec-fetch-site': 'same-origin',
-//           'x-csrf-token': 'nEAWAmY92HPfMRhiGoaybFzdwkDlWa2Bra7835GN',
-//           'x-requested-with': 'XMLHttpRequest',
-//           'x-xsrf-token':
-//             'eyJpdiI6IkNud2xlWFhtY24xdXRTb2hMSmpkbmc9PSIsInZhbHVlIjoiN21LN1c5TjA5NEo5VXpjcm1hRFZ2eXRna0lralg2dEhcL2V2YUdwdTVvbkZYOGVHQXoyYVQ2QWxDSlhKYStHekQiLCJtYWMiOiJhNTQyMjk3OWNjNjA1Y2E0YWNmN2IxMTFhMDlhODcwZTBkYzM2MTI5ZTU0NDU3NzNkYjQzZDk1OGQ3NGYzODUxIn0=',
-//         },
-//         referrer:
-//           `https://atl.ua/ua/avtohimiya/masla/motornye/page-${idx-1}?brand=mazda-brand,mitsubishi-brand,vag,subaru-brand,mobis,motul,bmw-brand,nissan-brand,aral,toyota-brand,elf,ford-brand,general-motors,mercedes-benz-brand,prista-oil,total,honda-brand,shell,mobil,castrol,liqui-moly,hyundaikia&emkosttary=1l,4l,41l,5l,20l,60l,2l,0946l`,
-//         referrerPolicy: 'strict-origin-when-cross-origin',
-//         body: null,
-//         method: 'GET',
-//         mode: 'cors',
-//         credentials: 'include',
-//       }
-//     );
-// 			const data = await response.json();
-// 			RES.push(...data.products);
-// 			await new Promise(resolve => setTimeout(resolve, 2000))
-// 		} catch (error) {
-// 			console.log(error)
-// 		}
-// 		}
-// }
 // await getAtlFirst()
 
 // todo
@@ -69,6 +29,46 @@ import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 // const filePathToJSONFifth = './workData/atl/motorOilsAtl.json';
 // createSpecAndCommonJSON(filePathToJSONFifth);
 
+async function getAtlFirst() {
+	for (let idx = 2; idx < 86; idx++) {
+		try {
+    const response = await fetch(
+      `https://atl.ua/ua/avtohimiya/masla/motornye/page-${idx}?brand=mazda-brand,mitsubishi-brand,vag,subaru-brand,mobis,motul,bmw-brand,nissan-brand,aral,toyota-brand,elf,ford-brand,general-motors,mercedes-benz-brand,prista-oil,total,honda-brand,shell,mobil,castrol,liqui-moly,hyundaikia&emkosttary=1l,4l,41l,5l,20l,60l,2l,0946l`,
+      {
+        headers: {
+          accept: 'application/json, text/plain, */*',
+          'accept-language': 'ua',
+          'cache-control': 'no-cache',
+          pragma: 'no-cache',
+          priority: 'u=1, i',
+          'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          'sec-ch-ua-mobile': '?0',
+          'sec-ch-ua-platform': '"Windows"',
+          'sec-fetch-dest': 'empty',
+          'sec-fetch-mode': 'cors',
+          'sec-fetch-site': 'same-origin',
+          'x-csrf-token': 'nEAWAmY92HPfMRhiGoaybFzdwkDlWa2Bra7835GN',
+          'x-requested-with': 'XMLHttpRequest',
+          'x-xsrf-token':
+            'eyJpdiI6IkNud2xlWFhtY24xdXRTb2hMSmpkbmc9PSIsInZhbHVlIjoiN21LN1c5TjA5NEo5VXpjcm1hRFZ2eXRna0lralg2dEhcL2V2YUdwdTVvbkZYOGVHQXoyYVQ2QWxDSlhKYStHekQiLCJtYWMiOiJhNTQyMjk3OWNjNjA1Y2E0YWNmN2IxMTFhMDlhODcwZTBkYzM2MTI5ZTU0NDU3NzNkYjQzZDk1OGQ3NGYzODUxIn0=',
+        },
+        referrer:
+          `https://atl.ua/ua/avtohimiya/masla/motornye/page-${idx-1}?brand=mazda-brand,mitsubishi-brand,vag,subaru-brand,mobis,motul,bmw-brand,nissan-brand,aral,toyota-brand,elf,ford-brand,general-motors,mercedes-benz-brand,prista-oil,total,honda-brand,shell,mobil,castrol,liqui-moly,hyundaikia&emkosttary=1l,4l,41l,5l,20l,60l,2l,0946l`,
+        referrerPolicy: 'strict-origin-when-cross-origin',
+        body: null,
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+      }
+    );
+			const data = await response.json();
+			RES.push(...data.products);
+			await new Promise(resolve => setTimeout(resolve, 2000))
+		} catch (error) {
+			console.log(error)
+		}
+		}
+}
 
 async function mainFirst(filePath) {
   try {
