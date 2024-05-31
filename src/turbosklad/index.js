@@ -125,9 +125,9 @@ async function downloadImgs(jsonPath, resutFileName) {
   const productsObj = await parseJSONFile(jsonPath);
   const objKeys = Object.keys(productsObj);
   for (let idxKeys = 0; idxKeys < objKeys.length; idxKeys++) {
-  // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
+    // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
     const objKey = objKeys[idxKeys];
-    const imgsCommonFolderPath = path.resolve('images').replace(/\\/g,'/');
+    const imgsCommonFolderPath = path.resolve('images').replace(/\\/g, '/');
     const imgCategoryFolderPath = `${imgsCommonFolderPath}/${objKey}`;
     if (!fs.existsSync(imgsCommonFolderPath)) {
       fs.mkdirSync(imgsCommonFolderPath);
@@ -138,7 +138,7 @@ async function downloadImgs(jsonPath, resutFileName) {
     console.log(objKey);
     const products = productsObj[objKey];
     for (let idxProd = 0; idxProd < products.length; idxProd++) {
-    // for (let idxProd = 0; idxProd < 1; idxProd++) {
+      // for (let idxProd = 0; idxProd < 1; idxProd++) {
       const product = products[idxProd];
       const imgsLinks = product.images;
       const pics = [];
@@ -149,17 +149,46 @@ async function downloadImgs(jsonPath, resutFileName) {
         pics.push(`./images/${objKey}/${imgName}`);
         const fullImgPath = `${imgCategoryFolderPath}/${imgName}`;
         try {
-          await saveImg(imgLink, fullImgPath)
+          await saveImg(imgLink, fullImgPath);
         } catch (error) {
           console.log(error);
           continue;
         }
       }
       product.pics = pics.join(';');
-			console.log('product idx->',idxProd)
-
+      console.log('product idx->', idxProd);
     }
   }
   await saveToJson('./', resutFileName, productsObj);
 }
-downloadImgs('turboSkladLinksFull', 'turboSklad');
+// downloadImgs('turboSkladLinksFull', 'turboSklad');
+
+async function createApplicability(jsonPath) {
+  const productsObj = await parseJSONFile(jsonPath);
+  const objKeys = Object.keys(productsObj);
+  for (let idxKeys = 0; idxKeys < objKeys.length; idxKeys++) {
+    // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
+      const objKey = objKeys[idxKeys];
+      const products = productsObj[objKey];
+      for (let idxProd = 0; idxProd < products.length; idxProd++) {
+        // for (let idxProd = 0; idxProd < 2; idxProd++) {
+      const product = products[idxProd];
+      const applicability = [];
+      const applianceFull = product?.applianceFull;
+      applianceFull?.forEach(item => {
+        const brand = item?.brand || '';
+        const models=item?.model?.split('/')?.map(it=>({model:it || '', years:item?.years || ''})) || []
+        const obj = { brand, models };
+        const isInapplicability = applicability.findIndex(it => it.brand === brand);
+        if (isInapplicability === -1) {
+          applicability.push(obj);
+        } else applicability[isInapplicability].models.push(...models);
+      });
+      product.applicability=applicability
+    }
+  }
+
+  await saveToJson('./', 'turboSkladFull', productsObj);
+}
+
+createApplicability('turboSklad');
