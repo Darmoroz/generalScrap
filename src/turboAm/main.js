@@ -91,12 +91,12 @@ async function getFinishPartialProducts(jsonPath) {
   const itemsObj = await parseJSONFile(jsonPath);
   const objKeys = Object.keys(itemsObj);
   for (let idxKeys = 0; idxKeys < objKeys.length; idxKeys++) {
-  // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
+    // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
     const itemsObjKey = objKeys[idxKeys];
     const items = itemsObj[itemsObjKey];
     console.log(itemsObjKey);
     for (let idxIt = 0; idxIt < items.length; idxIt++) {
-    // for (let idxIt = 0; idxIt < 1; idxIt++) {
+      // for (let idxIt = 0; idxIt < 1; idxIt++) {
       const item = items[idxIt];
       const itemLink = item.linkUk;
       try {
@@ -134,4 +134,45 @@ async function getFinishPartialProducts(jsonPath) {
   }
 }
 
-getFinishPartialProducts('turboAm');
+// getFinishPartialProducts('turboAm');
+
+async function createFileCRM(jsonPath) {
+  const itemsObj = await parseJSONFile(jsonPath);
+  const objKeys = Object.keys(itemsObj);
+  for (let idxKeys = 0; idxKeys < objKeys.length; idxKeys++) {
+  // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
+    const itemsObjKey = objKeys[idxKeys];
+    const items = itemsObj[itemsObjKey];
+    for (let idxIt = 0; idxIt < items.length; idxIt++) {
+    // for (let idxIt = 0; idxIt < 1; idxIt++) {
+      const item = items[idxIt];
+      item.name = itemsObjKey + ' ' + item.name;
+
+      const description = `Бренд\n${item.brand}\nJrone\n${item.jroneCode}\nE&E Turbos\n${
+        item.ee
+      }\nМарки авто\n${item.noteAboutAuto.reduce((acc, curr) => {
+        acc = acc + `${curr.brand}\n${curr.note}\n`;
+        return acc;
+      }, '')}`.slice(0, -1);
+      item.description = description;
+      const descriptionSec = `Бренд\n${item.brand}\nJrone\n${item.jroneCode}\nE&E Turbos\n${item.ee}\nМарки авто\n${item.spec.reduce(
+        (acc, curr, idx) => {
+          const objEntries=(idx+1)+")\n"+ Object.entries(curr).map(([key, value])=>`${key}:${value}`).join('\n')+'\n'
+
+          acc=acc+objEntries
+          return acc;
+        },
+        ''
+      )}`;
+      item.descriptionSec=descriptionSec
+    }
+  }
+  try {
+    await saveToJson('./', 'turboAmCRM', itemsObj);
+  } catch (error) {
+    console.log('error save to JSON\n', error);
+  }
+
+}
+
+createFileCRM('turboAm');
