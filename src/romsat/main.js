@@ -57,19 +57,19 @@ async function getStartPartialProducts(categoriesLinks, resultFileName) {
 // getStartPartialProducts(mainLinks, 'romsat');
 
 async function getFinishPartialProducts(jsonPath) {
-	const resultsCommon = {};
-	const resultsSpec = {};
+  const resultsCommon = {};
+  const resultsSpec = {};
   const itemsObj = await parseJSONFile(jsonPath);
   const objKeys = Object.keys(itemsObj);
   for (let idxKeys = 0; idxKeys < objKeys.length; idxKeys++) {
-  // for (let idxKeys = 0; idxKeys < 1; idxKeys++) {
+  // for (let idxKeys = 0; idxKeys < 2; idxKeys++) {
     const commonArr = [];
     const specArr = [];
     const itemsObjKey = objKeys[idxKeys];
     const items = itemsObj[itemsObjKey];
     console.log(itemsObjKey);
     for (let idxIt = 0; idxIt < items.length; idxIt++) {
-    // for (let idxIt = 0; idxIt < 1; idxIt++) {
+      // for (let idxIt = 0; idxIt < 5; idxIt++) {
       const item = items[idxIt];
       const { link, sku, name, category, priceUAH } = item;
       try {
@@ -83,11 +83,21 @@ async function getFinishPartialProducts(jsonPath) {
             this.innerHTML = value;
           },
         });
+
         const brand = document.querySelector(
           '.card_page-cont .tab-content div[data-tab="1"] p a'
         )?.textContent;
 
-        const images = JSON.parse(normalizeStr(document.querySelector('.catalog-detail-page>script')?.textContent.replace(/var srccc = |;/g,'').replace(/'/g,'"'))).map(el=>`https://romsat.ua${el.SRC}`).join(';')
+        const images = JSON.parse(
+          normalizeStr(
+            document
+              .querySelector('.catalog-detail-page>script')
+              ?.textContent.replace(/var srccc = |;/g, '')
+              .replace(/'/g, '"')
+          )
+        )
+          .map(el => `https://romsat.ua${el.SRC}`)
+          .join(';');
 
         const aliasArr = link.split('/');
         const alias = aliasArr[aliasArr.length - 2];
@@ -159,16 +169,18 @@ async function getFinishPartialProducts(jsonPath) {
         itemSpec['Бренд(UA)'] = brand;
         itemSpec['Бренд(RU)'] = brand;
         const specTemp = { ...itemSpec, ...specInfo, ...specInfoMain };
+        const commonTemp={...itemInfo}
 
-        commonArr.push(itemInfo);
+
+        commonArr.push(commonTemp);
         specArr.push(specTemp);
-				console.log(idxIt,'/',items.length-1 )
+        console.log(idxIt, '/', items.length - 1);
       } catch (error) {
         console.log('request error', error);
       }
     }
-		resultsCommon[itemsObjKey]=commonArr
-		resultsSpec[itemsObjKey]=specArr
+    resultsCommon[itemsObjKey] = commonArr;
+    resultsSpec[itemsObjKey] = specArr;
   }
   try {
     await saveToJson('./', 'commonRomsat', resultsCommon);
@@ -178,4 +190,4 @@ async function getFinishPartialProducts(jsonPath) {
   }
 }
 
-// getFinishPartialProducts('romsat', 'test');
+getFinishPartialProducts('romsat');
