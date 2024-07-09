@@ -6,7 +6,10 @@ export const CATEGORIES = [
   'planshety/127-displei',
   'mobilnye-telefony/104-sensornye-stekla',
   'planshety/125-sensornye-stekla',
-  'planshety/215-steklo-k-korpusu'
+  'planshety/215-steklo-k-korpusu',
+  'mobilnye-telefony/24-akkumulyatory',
+  'planshety/128-akkumulyatory',
+  'radiodetali-mikroshemy/597-akkumulatory-universalnye'
 ];
 
 export const FILES_CAT = [
@@ -19,7 +22,13 @@ export const FILES_CAT = [
   'Запчасти для планшетов>Сенсорное стекло',
   'Запчастини для планшетів>Сенсорне скло',
   'Запчасти для планшетов>Корпусное стекло дисплея',
-  'Запчастини для планшетів>Корпусне скло дисплея'
+  'Запчастини для планшетів>Корпусне скло дисплея',
+  'Запчасти для телефонов>Аккумуляторы',
+  'Запчастини для телефонів>Акумулятори',
+  'Запчасти для планшетов>Аккумуляторы',
+  'Запчастини для планшетів>Акумулятори',
+  'Запчасти для планшетов>Универсальные аккумуляторы',
+  'Запчастини для планшетів>Універсальні акумулятори'
 ];
 export const product = {
   Категория: '',
