@@ -1,0 +1,163 @@
+import { saveToJson } from '../commonUtils/saveToJson.js';
+import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
+
+import { concatDataJsonFiles } from '../commonUtils/concatDataJsonFiles.js';
+
+const filePathJson = 'data/turboSklad';
+const brand = 'turboSklad';
+
+const CAT_KEYS = {
+  Актуатор: 'Клапан(актуатор) турбіни',
+  Геометрия: 'Сопловий апарат(геометрія) турбіни',
+  Картирдж: 'Картридж турбіни',
+  Корпус: 'Корпус турбокомпресора',
+  Сервопривід: 'Електронний актуатор турбіни(сервопривід)',
+  Турбина: 'Турбокомпресор',
+  'novye-turbiny': 'Турбокомпресор',
+  'kartridzhi-srednyaya': 'Картридж турбіни',
+  'vakuumnye-aktuatory': 'Клапан(актуатор) турбіни',
+  'geometriya-turbiny': 'Сопловий апарат(геометрія) турбіни',
+};
+
+async function filterData(filePathJson, brand) {
+  try {
+    const items = await parseJSONFile(filePathJson);
+    const resultsCommon = [];
+    const resultsApplicab = [];
+    // items.forEach(el => {
+    //   const {
+    //     sku,
+    //     quantity = 30,
+    //     imgSmall,
+    //     price,
+    //     links,
+    //     nameItem,
+    //     type,
+    //     oe,
+    //     cross,
+    //     applicability,
+    //   } = el;
+    //   const imgSmallSplit = imgSmall.split(';');
+    //   const image = imgSmallSplit[0];
+    //   let additional_images = null;
+    //   if (imgSmallSplit.length > 1) {
+    //     additional_images = imgSmallSplit.slice(1).join('|');
+    //   }
+    //   const manufacturer = brand;
+    //   const link = links;
+    //   const seo_keyword_uk = null;
+    //   const name_uk = nameItem.trim();
+    //   const description_uk = `OE-КОДИ\n${oe.replace(/\n/g, ', ')}\nКРОС-КОДИ\n${cross.replace(
+    //     /\n/g,
+    //     ', '
+    //   )}`;
+    //   const meta_title_uk = name_uk;
+    //   const meta_description_uk = `Купити ${name_uk}`;
+    //   const meta_keyword_uk = null;
+    //   const meta_h1_uk = null;
+    //   const product_attribute =
+    //     'Загальні:Країна реєстрації виробника:Китай|Загальні:Тип продукту:Аналог|Загальні:Стан товару:Новий';
+
+    //   const key = type.split(' ')[0];
+
+    //   const product_category = CAT_KEYS[key];
+
+    //   // applicability.forEach(brandItem=>{
+    //   // 	const {models, brand}=brandItem;
+
+    //   // })
+    //   const item = {
+    //     link,
+    //     sku,
+    //     quantity,
+    //     image,
+    //     additional_images,
+    //     price,
+    //     manufacturer,
+    //     seo_keyword_uk,
+    //     name_uk,
+    //     description_uk,
+    //     meta_title_uk,
+    //     meta_description_uk,
+    //     meta_keyword_uk,
+    //     meta_h1_uk,
+    //     product_attribute,
+    //     product_category,
+    //   };
+    //   resultsCommon.push(item);
+    //   resultsApplicab.push({ sku, applicability });
+    // });
+    const itemsArr = Object.entries(items);
+    itemsArr.forEach(itemsByCat => {
+      const [key, items] = itemsByCat;
+      items.forEach(it => {
+        const { urlUk, sku, nameUk, price, desc, pics, applicability } = it;
+        const link = urlUk;
+        const quantity = 30;
+        const image = pics;
+        const additional_images = null;
+        const manufacturer = it['Производитель'];
+        const seo_keyword_uk = null;
+        const name_uk = nameUk;
+        const description_uk = desc;
+        const meta_title_uk = name_uk;
+        const meta_description_uk = `Купити ${name_uk}`;
+        const meta_keyword_uk = null;
+        const meta_h1_uk = null;
+        const product_attribute =
+          'Загальні:Країна реєстрації виробника:Китай|Загальні:Тип продукту:Аналог|Загальні:Стан товару:Новий';
+        const product_category = CAT_KEYS[key];
+
+        const item = {
+          link,
+          sku,
+          quantity,
+          image,
+          additional_images,
+          price,
+          manufacturer,
+          seo_keyword_uk,
+          name_uk,
+          description_uk,
+          meta_title_uk,
+          meta_description_uk,
+          meta_keyword_uk,
+          meta_h1_uk,
+          product_attribute,
+          product_category,
+        };
+        resultsCommon.push(item);
+        resultsApplicab.push({ sku, applicability });
+      });
+    });
+    await saveToJson('', `${brand}CommonForCsv`, resultsCommon);
+    await saveToJson('', `${brand}ApplicabForCsv`, resultsApplicab);
+  } catch (error) {
+    console.error('Error in filterData:', error);
+  }
+}
+
+// filterData(filePathJson, brand);
+
+// concatDataJsonFiles('common', 'common')
+// concatDataJsonFiles('applicab', 'applicab')
+async function fix() {
+  const items = await parseJSONFile('applicab');
+  console.log(items.length);
+
+  items.forEach((item, idx) => {
+    const { sku, applicability } = item;
+    applicability.forEach(brand => {
+      const { models } = brand;
+      models.forEach(model => {
+        const { years } = model;
+        if (!Array.isArray(years)) {
+          model.years = [years];
+        }
+      });
+    });
+  });
+	await saveToJson('', `app`, items);
+
+}
+// fix();
