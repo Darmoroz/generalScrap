@@ -1,7 +1,7 @@
 import { saveToJson } from '../commonUtils/saveToJson.js';
 import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 
-import { concatDataJsonFiles } from '../commonUtils/concatDataJsonFiles.js';
+// import { concatDataJsonFiles } from '../commonUtils/concatDataJsonFiles.js';
 
 const filePathJson = 'data/turboSklad';
 const brand = 'turboSklad';
@@ -141,23 +141,42 @@ async function filterData(filePathJson, brand) {
 
 // concatDataJsonFiles('common', 'common')
 // concatDataJsonFiles('applicab', 'applicab')
-async function fix() {
-  const items = await parseJSONFile('applicab');
-  console.log(items.length);
-
-  items.forEach((item, idx) => {
-    const { sku, applicability } = item;
-    applicability.forEach(brand => {
-      const { models } = brand;
-      models.forEach(model => {
-        const { years } = model;
-        if (!Array.isArray(years)) {
-          model.years = [years];
-        }
-      });
-    });
+async function fix(filePath) {
+  const items = await parseJSONFile(filePath);
+  items.forEach(it => {
+    const nameRu = it.name_uk
+      .replace(/турбіни/, 'турбины')
+      .replace(/електронний/, 'электронный')
+      .replace('Сопловий апарат (геометрія)', 'Сопловой аппарат (геометрия)')
+      .replace('Електронний', 'Электронный')
+      .replace('сервопривід', 'сервопривод')
+      .replace('Турбіна', 'Турбина')
+      .replace('Турбокомпресор', 'Турбокомпрессор')
+      .replace('керування', 'управления')
+      .replace('турбіною', 'турбиной')
+      .replace('Геометрія', 'Геометрия');
+    it.name_ru = nameRu;
+    it.meta_title_ru=nameRu;
+    it.meta_h1_ru = null;
+    it.meta_description_ru=`Купить ${nameRu}`;
+    const desc_ru=it.description_uk.replace('КОДИ', 'КОДЫ').replace('КРОС-КОДИ','КРОСС-КОДЫ').replace('Застосовність','Применимость').replace('Застосовується в турбінах','Применяется в турбинах').replace('АВТОМОБІЛЬ','АВТОМОБИЛЬ').replace('ОРИГІНАЛЬНИЙ НОМЕР ТУРБІНИ','ОРИГИНАЛЬНЫЙ НОМЕР ТУРБИНЫ').replace('ЗАВОДСЬКИЙ НОМЕР ТУРБІНИ','ЗАВОДСКОЙ НОМЕР ТУРБИНЫ').replaceAll('турбіни', 'турбины')
+    it.description_ru = desc_ru;
   });
-	await saveToJson('', `app`, items);
 
+  // items.forEach((item, idx) => {
+  //   const { sku, applicability } = item;
+  //   applicability.forEach(brand => {
+  //     const { models } = brand;
+  //     models.forEach(model => {
+  //       const { years } = model;
+  //       if (!Array.isArray(years)) {
+  //         model.years = [years];
+  //       }
+  //     });
+  //   });
+  // });
+
+  await saveToJson('', filePath, items);
 }
-// fix();
+// const file = 'common';
+// fix(file);
