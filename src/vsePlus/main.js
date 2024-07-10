@@ -8,11 +8,13 @@ import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 import { normalizeStr } from '../commonUtils/normalizeStr.js';
 import { delay } from '../commonUtils/delay.js';
 import { saveImg } from '../commonUtils/saveImg.js';
-import { BASE_URL_RU, BASE_URL_UA, CATEGORIES, FILES_CAT, product } from './initData.js';
+import { BASE_URL_RU, BASE_URL_UA, CATEGORIES, FILES_CAT} from './initData.js';
 
 import { getFilesPath } from './getFilesPath.js';
 
-const startCatIdx = 5;
+//* зупинилися на індекс 12 включно
+
+const startCatIdx = 9;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -45,14 +47,13 @@ async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsF
   let lastPage = null;
   while (page) {
     const pageLink = `${baseUrl}/product/${categoryUrl}/p-${page}`;
-    console.log('PAGE->', page);
+    console.log(`PAGE-> ${page} (${baseUrl.includes('/ua') ? 'ua' : 'ru'} ${categoryUrl})` );
     try {
       const { data } = await axios.get(pageLink);
       const { document } = new JSDOM(data).window;
       if (page === startPage) {
-        const lastPageEl = document.querySelector('.paginator .paginator__page_last a');
+        const lastPageEl = document.querySelector('.paginator .paginator__page:last-child a');
         lastPage = lastPageEl ? Number(lastPageEl.textContent) : 1;
-        // lastPage = 1;
       }
       const products = [
         ...document.querySelectorAll('.list-cards-product .card-product__content'),
@@ -151,7 +152,9 @@ async function getScondPartOfData(dirPath) {
           product.userSKU = `1${sku}`;
           product.userPrice = Math.ceil(price - price * 0.05);
           retries = MAX_RETRIES;
-          console.log(`Success: ${idxProd}/${products.length - 1}`);
+          const splitFilePath=filePath.split('/')
+          const filesLang=splitFilePath[splitFilePath.length-1]
+          console.log(`Success: ${idxProd}/${products.length - 1} ${filesLang}`);
         } catch (error) {
           console.log(error);
           console.log(`Request error at file ${idx} and product's  index ${idxProd}`);
