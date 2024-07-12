@@ -8,13 +8,13 @@ import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 import { normalizeStr } from '../commonUtils/normalizeStr.js';
 import { delay } from '../commonUtils/delay.js';
 import { saveImg } from '../commonUtils/saveImg.js';
-import { BASE_URL_RU, BASE_URL_UA, CATEGORIES, FILES_CAT} from './initData.js';
+import { BASE_URL_RU, BASE_URL_UA, CATEGORIES, FILES_CAT } from './initData.js';
 
 import { getFilesPath } from './getFilesPath.js';
 
-//* зупинилися на індекс 12 включно
+//* зупинилися на індекс 20 включно
 
-const startCatIdx = 9;
+const startCatIdx = 20;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -33,8 +33,14 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
       : FILES_CAT[(idx + 1) * 2 - 2];
     let page = startPage;
     const lang = mainUrl.includes('/ua') ? 'ua' : 'ru';
-    const fileName = categoryUrl.replace(/\//g, '-');
+    let fileName = null;
+    if (typeof categoryUrl === 'function') {
+      fileName = categoryUrl(1).replace('search/p-1?q=', '');
+    } else {
+      fileName = categoryUrl.replace(/\//g, '-');
+    }
     const jsonFileName = `${jsonFilesDir}/${fileName}-${lang}`;
+    console.log(jsonFileName);
     await getFirstPartOfData(page, mainUrl, categoryUrl, category, jsonFileName);
   }
 }
@@ -46,8 +52,17 @@ async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsF
   const results = [];
   let lastPage = null;
   while (page) {
-    const pageLink = `${baseUrl}/product/${categoryUrl}/p-${page}`;
-    console.log(`PAGE-> ${page} (${baseUrl.includes('/ua') ? 'ua' : 'ru'} ${categoryUrl})` );
+    let pageLink = null;
+    if (typeof categoryUrl === 'function') {
+      pageLink = `${baseUrl}/${categoryUrl(page)}`;
+    } else {
+      pageLink = `${baseUrl}/product/${categoryUrl}/p-${page}`;
+    }
+    console.log(
+      `PAGE-> ${page} (${baseUrl.includes('/ua') ? 'ua' : 'ru'} ${
+        typeof categoryUrl === 'function' ? categoryUrl(page) : categoryUrl
+      })`
+    );
     try {
       const { data } = await axios.get(pageLink);
       const { document } = new JSDOM(data).window;
@@ -99,8 +114,9 @@ async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsF
     }
   }
   try {
-    await saveToJson('./', resultsFileName, results);
+    await saveToJson('./', resultsFileName.replace(), results);
   } catch (error) {
+    console.log(error);
     console.log('error save resultJson FirstPart');
   }
 }
@@ -152,8 +168,8 @@ async function getScondPartOfData(dirPath) {
           product.userSKU = `1${sku}`;
           product.userPrice = Math.ceil(price - price * 0.05);
           retries = MAX_RETRIES;
-          const splitFilePath=filePath.split('/')
-          const filesLang=splitFilePath[splitFilePath.length-1]
+          const splitFilePath = filePath.split('\\');
+          const filesLang = splitFilePath[splitFilePath.length - 1];
           console.log(`Success: ${idxProd}/${products.length - 1} ${filesLang}`);
         } catch (error) {
           console.log(error);
@@ -217,10 +233,6 @@ async function createExcelFileFromJson(dirPath) {
     console.log('Excel file has been created');
   }
 }
-
-
-
-
 
 async function fixFoo(dirPath) {
   const filesPath = await getFilesPath(dirPath);
