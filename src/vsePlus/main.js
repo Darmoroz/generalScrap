@@ -213,7 +213,7 @@ async function createExcelFileFromJson(dirPath) {
         }
       });
     });
-    wb.write(filePath.replace(/json/g, 'xlsx').replace(/data/g, 'xlsx'));
+    wb.write(filePath.replace(/json|data/g, 'xlsx'));
     console.log('Excel file has been created');
   }
 }
