@@ -12,9 +12,9 @@ import { BASE_URL_RU, BASE_URL_UA, CATEGORIES, FILES_CAT } from './initData.js';
 
 import { getFilesPath } from './getFilesPath.js';
 
-//* зупинилися на індекс 20 включно
+//* зупинилися на індекс 25 включно
 
-const startCatIdx = 20;
+const startCatIdx = 26;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -26,7 +26,7 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
   const mainUrl = mainUrls[idxMainUrl];
 
   for (let idx = startCatIdx; idx < CATEGORIES.length; idx++) {
-    // for (let idx = 0; idx < 1; idx++) {
+  // for (let idx = startCatIdx; idx < 13; idx++) {
     const categoryUrl = CATEGORIES[idx];
     const category = mainUrl.includes('/ua')
       ? FILES_CAT[(idx + 1) * 2 - 1]
@@ -40,12 +40,11 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
       fileName = categoryUrl.replace(/\//g, '-');
     }
     const jsonFileName = `${jsonFilesDir}/${fileName}-${lang}`;
-    console.log(jsonFileName);
-    await getFirstPartOfData(page, mainUrl, categoryUrl, category, jsonFileName);
+    // await getFirstPartOfData(page, mainUrl, categoryUrl, category, jsonFileName);
   }
 }
 
-await getScondPartOfData(jsonFilesDir);
+// await getScondPartOfData(jsonFilesDir);
 await createExcelFileFromJson(jsonFilesDir);
 
 async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsFileName) {
@@ -93,6 +92,7 @@ async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsF
         Object.keys(spec).forEach(key => {
           spec[key] = spec[key].join(', ');
         });
+        // const note=el.querySelector('.card-product__text_note')?.textContent
         return { link, category, sku, title, price, prevImg, ...spec };
       });
       if (products.length !== PER_PAGE) {
@@ -239,14 +239,17 @@ async function fixFoo(dirPath) {
   for (let idx = 0; idx < filesPath.length; idx++) {
     const filePath = filesPath[idx];
     const products = await parseJSONFile(filePath.replace(/.json/g, ''));
-    products.forEach(it => {
-      const { imgs } = it;
-      if (Array.isArray(imgs)) {
-        it.imgs = imgs.join(';');
-      } else {
-        it.imgs = imgs;
-      }
-    });
+
+// const noteProducts=products.filter(it=>it.note).map(({link, sku, note})=>({link, sku, note}));
+    
+// products.forEach(it => {
+    //   const { imgs } = it;
+    //   if (Array.isArray(imgs)) {
+    //     it.imgs = imgs.join(';');
+    //   } else {
+    //     it.imgs = imgs;
+    //   }
+    // });
     try {
       await saveToJson('', filePath.replace(/.json/g, ''), products);
     } catch (error) {
