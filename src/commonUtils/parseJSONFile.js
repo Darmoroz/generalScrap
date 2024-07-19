@@ -2,7 +2,7 @@ import fs from 'fs';
 
 export async function parseJSONFile(filePath) {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf8', (err, data) => {
+    fs.readFile(`${filePath}.json`, 'utf8', (err, data) => {
       if (err) {
         reject(err);
         return;
