@@ -1,6 +1,6 @@
 import { saveToJson } from '../commonUtils/saveToJson.js';
-import { xlsxToJs } from 'xlsxToJs.js';
-import { getFilesPath } from 'getFilesPath.js';
+import { xlsxToJs } from './xlsxToJs.js';
+import { getFilesPath } from './getFilesPath.js';
 
 const XLSX_DIR = 'xlsx';
 
@@ -9,10 +9,10 @@ async function main(xlsxDir) {
   for (let idxFiles = 0; idxFiles < files.length; idxFiles++) {
     const file = files[idxFiles];
     const jsFileData = await xlsxToJs(file);
-    jsFileData.forEach(it => {
-      const applicab = it['Совместимые модели'];
-      it['Совместимые модели'] = removeDuplicateSubstrings(applicab);
-    });
+    // jsFileData.forEach(it => {
+    //   const applicab = it['Совместимые модели'];
+    //   it['Совместимые модели'] = removeDuplicateSubstrings(applicab);
+    // });
     await saveToJson('', file.replace('.xlsx', ''), jsFileData);
   }
 }

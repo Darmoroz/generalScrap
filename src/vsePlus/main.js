@@ -11,10 +11,12 @@ import { saveImg } from '../commonUtils/saveImg.js';
 import { BASE_URL_RU, BASE_URL_UA, CATEGORIES, FILES_CAT } from './initData.js';
 
 import { getFilesPath } from './getFilesPath.js';
+import { CustomSet } from './customSet.js';
+import {getUniqObjByKey} from './getUniqObjByKey.js'
 
-//* зупинилися на індекс 25 включно
+//* зупинилися на індекс 35 включно
 
-const startCatIdx = 26;
+const startCatIdx = 36;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -26,7 +28,7 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
   const mainUrl = mainUrls[idxMainUrl];
 
   for (let idx = startCatIdx; idx < CATEGORIES.length; idx++) {
-  // for (let idx = startCatIdx; idx < 13; idx++) {
+    // for (let idx = startCatIdx; idx < 13; idx++) {
     const categoryUrl = CATEGORIES[idx];
     const category = mainUrl.includes('/ua')
       ? FILES_CAT[(idx + 1) * 2 - 1]
@@ -235,14 +237,21 @@ async function createExcelFileFromJson(dirPath) {
 }
 
 async function fixFoo(dirPath) {
-  const filesPath = await getFilesPath(dirPath);
+  const filesPathAll = await getFilesPath(dirPath);
+  const filesPath = filesPathAll.filter(file => file.includes('.ua'));
+  console.log(filesPath.length);
+  const results = [];
   for (let idx = 0; idx < filesPath.length; idx++) {
     const filePath = filesPath[idx];
-    const products = await parseJSONFile(filePath.replace(/.json/g, ''));
+    try {
+      const data = await parseJSONFile(filePath.replace(/.json/g, ''));
+      results.push(...data);
+    } catch (err) {
+      console.log('error parse json file', err);
+    }
+    // const noteProducts=products.filter(it=>it.note).map(({link, sku, note})=>({link, sku, note}));
 
-// const noteProducts=products.filter(it=>it.note).map(({link, sku, note})=>({link, sku, note}));
-    
-// products.forEach(it => {
+    // products.forEach(it => {
     //   const { imgs } = it;
     //   if (Array.isArray(imgs)) {
     //     it.imgs = imgs.join(';');
@@ -250,12 +259,18 @@ async function fixFoo(dirPath) {
     //     it.imgs = imgs;
     //   }
     // });
-    try {
-      await saveToJson('', filePath.replace(/.json/g, ''), products);
-    } catch (error) {
-      console.log('error save resultJson SecondPart');
-    }
+    // try {
+    //   await saveToJson('', filePath.replace(/.json/g, ''), products);
+    // } catch (error) {
+    //   console.log('error save resultJson SecondPart');
+    // }
   }
+  try {
+    await saveToJson('', 'vsePlus_ua', results);
+  } catch (error) {
+    console.log('error save resultJson SecondPart');
+  }
+  console.log(results.length);
 }
 
 async function getUniqKeys(dirPath) {
@@ -274,3 +289,26 @@ async function getUniqKeys(dirPath) {
 
 // fixFoo(jsonFilesDir);
 // getUniqKeys(jsonFilesDir);
+
+async function getUniqElements(dirPath) {
+  const filesPath = await getFilesPath(dirPath);
+  const uniqSku= await parseJSONFile('intersectionSku')
+  
+  const fileRu = filesPath.filter(file => file.includes('ru'));
+  const fileUa = filesPath.filter(file => file.includes('ua'));
+  const dataRu = await parseJSONFile(fileRu[0].replace(/.json/g, ''));
+  const dataUa = await parseJSONFile(fileUa[0].replace(/.json/g, ''));
+  const dataRuUniq= getUniqObjByKey(dataRu, 'sku')
+  const dataUaUniq = getUniqObjByKey(dataUa, 'sku')
+  const dataRuInterSection=dataRuUniq.filter(it=>uniqSku.includes(it.sku))
+  const dataUaInterSection=dataUaUniq.filter(it=>uniqSku.includes(it.sku))
+  // const ruUniq = new CustomSet(dataRu.map(el => el.sku));
+  // const uaUniq = new CustomSet(dataUa.map(el => el.sku));
+  // console.log('ru', ruUniq.size);
+  // console.log('ua', uaUniq.size);
+  // console.log(ruUniq.difference(uaUniq))
+  // console.log(uaUniq.difference(ruUniq))
+  await saveToJson('', 'vsePlus_ru',dataRuInterSection)
+  await saveToJson('', 'vsePlus_ua', dataUaInterSection)
+}
+// getUniqElements(jsonFilesDir);
