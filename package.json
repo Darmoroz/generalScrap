@@ -21,6 +21,9 @@
     "puppeteer": "^21.11.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "transliteration": "^2.3.5"
+    "tough-cookie": "^4.1.4",
+    "transliteration": "^2.3.5",
+    "xlsx": "^0.18.5"
+    
   }
 }
