@@ -24,5 +24,6 @@
     "tough-cookie": "^4.1.4",
     "transliteration": "^2.3.5",
     "xlsx": "^0.18.5"
+    
   }
 }
