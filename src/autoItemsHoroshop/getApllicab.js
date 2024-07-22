@@ -46,7 +46,8 @@ const oilsOlyva = await parseJSONFile(oilsPathOlyva);
 // await saveToJson('', 'filtersFined', filtersResults);
 
 // for (let idxOils = 0; idxOils < oilsOlyva.length; idxOils++) {
-for (let idxOils = 18; idxOils < 20; idxOils++) {
+// for (let idxOils = 18; idxOils < 20; idxOils++) {
+for (let idxOils = 22; idxOils < 22; idxOils++) {
   const apllicabResults = [];
   const item = oilsOlyva[idxOils];
   const { sku, idExist } = item;
