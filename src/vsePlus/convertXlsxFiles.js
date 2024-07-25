@@ -1,6 +1,6 @@
 import { saveToJson } from '../commonUtils/saveToJson.js';
-import { xlsxToJs } from './xlsxToJs.js';
-import { getFilesPath } from './getFilesPath.js';
+import { xlsxToJs } from './utils/xlsxToJs.js';
+import { getFilesPath } from './utils/getFilesPath.js';
 
 const XLSX_DIR = 'xlsx';
 
