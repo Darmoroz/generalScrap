@@ -45,9 +45,10 @@ const oilsOlyva = await parseJSONFile(oilsPathOlyva);
 // console.log('filtersFined', filtersResults.length);
 // await saveToJson('', 'filtersFined', filtersResults);
 
-// for (let idxOils = 0; idxOils < oilsOlyva.length; idxOils++) {
-// for (let idxOils = 18; idxOils < 20; idxOils++) {
-for (let idxOils = 22; idxOils < 22; idxOils++) {
+let idxOils = 30;
+const lastIdxOils = 30;
+// while (idxOils<oilsOlyva.length) {
+while (idxOils < lastIdxOils) {
   const apllicabResults = [];
   const item = oilsOlyva[idxOils];
   const { sku, idExist } = item;
@@ -60,65 +61,81 @@ for (let idxOils = 22; idxOils < 22; idxOils++) {
   const prodId = `product_id=${idExist}`;
   const queryBrand = prodId;
   const brandLink = `${ROOT_LINK}${BRAND_API_LINK}/?${queryBrand}`;
-  const {
-    data: { data },
-  } = await axios.get(brandLink);
-  apllicabResults.push(...data);
-  for (let idxBrand = 0; idxBrand < apllicabResults.length; idxBrand++) {
-    // for (let idxBrand = 0; idxBrand < 1; idxBrand++) {
-    const brand = apllicabResults[idxBrand];
-    const queryModel = `${queryBrand}&manufacture=${brand.slug}`;
-    const modelLink = `${ROOT_LINK}${MODEL_API_LINK}/?${queryModel}`;
+  try {
     const {
-      data: {
-        data: { model_list },
-      },
-    } = await axios.get(modelLink);
-    brand.models = model_list;
-    for (let idxModels = 0; idxModels < model_list.length; idxModels++) {
-      // for (let idxModels = 0; idxModels < 1; idxModels++) {
-      const model = model_list[idxModels];
-      const queryType = `${queryModel}&slug=${model.slug}`;
-      const typeLink = `${ROOT_LINK}${TYPE_MODEL_API_LINK}/?${queryType}`;
-      const {
-        data: {
-          data: { model_type_list },
-        },
-      } = await axios.get(typeLink);
-      model.model_type_list = model_type_list;
-      console.log(
-        `${brand.slug.toUpperCase()}->${+idxBrand}/${+apllicabResults.length}; ${model.slug.toUpperCase()}->${+idxModels}/${+model_list.length}; type amount ${+model_type_list.length}`
-      );
-      for (let idxType = 0; idxType < model_type_list.length; idxType++) {
-        // for (let idxType = 0; idxType < 1; idxType++) {
-        const modelType = model_type_list[idxType];
-        const queryModification = `${queryModel}&model_type=${modelType.slug}`;
-        const modificationLink = `${ROOT_LINK}${MODIFICATION_API_LINK}/?${queryModification}`;
-        try {
-          const {
-            data: { data },
-          } = await axios.get(modificationLink);
-          modelType.modification_list = data.modification_list;
-          if (
-            idxType === 5 ||
-            idxType === 12 ||
-            idxType === 24 ||
-            idxType === 48 ||
-            idxType === 72 ||
-            idxType === 96
-          ) {
-            await delay(5000);
+      data: { data },
+    } = await axios.get(brandLink);
+    apllicabResults.push(...data);
+    let idxBrands = 0;
+    while (idxBrands < apllicabResults.length) {
+      const brand = apllicabResults[idxBrands];
+      const queryModel = `${queryBrand}&manufacture=${brand.slug}`;
+      const modelLink = `${ROOT_LINK}${MODEL_API_LINK}/?${queryModel}`;
+      try {
+        const {
+          data: {
+            data: { model_list },
+          },
+        } = await axios.get(modelLink);
+        brand.models = model_list;
+        let idxModels = 0;
+        while (idxModels < model_list.length) {
+          const model = model_list[idxModels];
+          const queryType = `${queryModel}&slug=${model.slug}`;
+          const typeLink = `${ROOT_LINK}${TYPE_MODEL_API_LINK}/?${queryType}`;
+          try {
+            const {
+              data: {
+                data: { model_type_list },
+              },
+            } = await axios.get(typeLink);
+            model.model_type_list = model_type_list;
+            console.log(
+              `${brand.slug.toUpperCase()}->${+idxBrands}/${+apllicabResults.length-1}; ${model.slug.toUpperCase()}->${+idxModels}/${+model_list.length-1}; type amount ${+model_type_list.length}`
+            );
+            let idxTypes = 0;
+            while (idxTypes < model_type_list.length) {
+              const modelType = model_type_list[idxTypes];
+              const queryModification = `${queryModel}&model_type=${modelType.slug}`;
+              const modificationLink = `${ROOT_LINK}${MODIFICATION_API_LINK}/?${queryModification}`;
+              try {
+                const {
+                  data: { data },
+                } = await axios.get(modificationLink);
+                modelType.modification_list = data.modification_list;
+                if (idxTypes === 5 || idxTypes === 11 || idxTypes === 18 || idxTypes === 25) {
+                  await delay(3000);
+                }
+                await saveToJson(
+                  itemFolder,
+                  `${data.manufacture.slug}_${data.model_type.slug}`,
+                  data
+                );
+              } catch (error) {
+                console.log(`request error MODIFICATION -> ${queryModification}`);
+              }
+              idxTypes++;
+            }
+            idxModels++;
+          } catch (error) {
+            console.log(`request error MODEL_TYPE -> ${queryType}`);
           }
-          await saveToJson(itemFolder, `${data.manufacture.slug}_${data.model_type.slug}`, data);
-        } catch (error) {
-          console.log(error.message);
         }
+
+        idxBrands++;
+      } catch (error) {
+        console.log(`request error MODEL -> ${queryModel}`);
       }
     }
-  }
-  try {
-    await saveToJson('./apllicabData/', itemName, apllicabResults);
+
+    try {
+      await saveToJson('./apllicabData/', itemName, apllicabResults);
+    } catch (error) {
+      console.log(`apllicabData save JSON error`);
+    }
+
+    idxOils++;
   } catch (error) {
-    console.log(`apllicabData save JSON error`);
+    console.log(`request error BRAND -> ${queryBrand}`);
   }
 }
