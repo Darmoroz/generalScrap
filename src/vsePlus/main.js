@@ -25,9 +25,8 @@ import { getFilesPath } from './utils/getFilesPath.js';
 import { CustomSet } from './utils/customSet.js';
 import { getUniqObjByKey } from './utils/getUniqObjByKey.js';
 
-//* зупинилися на індекс 35 включно
-
-const startCatIdx = 36;
+// *
+const startCatIdx = 28;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -37,7 +36,8 @@ const mainUrls = [BASE_URL_UA, BASE_URL_RU];
 
 const startId = 101;
 const jsonToExcelDir = 'data/sheetsXlsx';
-const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
+// const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
+const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
 const categoriesIdJson = 'data/categoriesId';
 const attrJson = 'data/attributesId';
 const attrGroupJson = 'data/attributesGroupId';
@@ -46,7 +46,7 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
   const mainUrl = mainUrls[idxMainUrl];
 
   for (let idx = startCatIdx; idx < CATEGORIES.length; idx++) {
-    // for (let idx = startCatIdx; idx < 13; idx++) {
+    // for (let idx = startCatIdx; idx < 1; idx++) {
     const categoryUrl = CATEGORIES[idx];
     const category = mainUrl.includes('/ua')
       ? FILES_CAT[(idx + 1) * 2 - 1]
@@ -57,17 +57,19 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
     if (typeof categoryUrl === 'function') {
       fileName = categoryUrl(1).replace('search/p-1?q=', '');
     } else {
-      fileName = categoryUrl.replace(/\//g, '-');
+      fileName = categoryUrl.replace(/\//g, '-').replace(/[<>:"\/\\|?*]/g, '_');
     }
     const jsonFileName = `${jsonFilesDir}/${fileName}-${lang}`;
     // await getFirstPartOfData(page, mainUrl, categoryUrl, category, jsonFileName);
   }
 }
 
-// await getScondPartOfData(jsonFilesDir);
-// await createExcelFileFromJson(jsonFilesDir);
+await getScondPartOfData(jsonFilesDir);
+await createExcelFileFromJson(jsonFilesDir);
 
 async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsFileName) {
+  console.log(resultsFileName)
+
   const results = [];
   let lastPage = null;
   while (page) {
@@ -151,7 +153,15 @@ async function getScondPartOfData(dirPath) {
     while (idxProd < products.length) {
       // while (idxProd < 3) {
       const product = products[idxProd];
-      const { link, sku, price } = product;
+      const { link, sku, price,error,userPrice } = product;
+      // if (!error) {
+      //   idxProd++
+      //   continue
+      // }
+      // if (userPrice) {
+      //   idxProd++
+      //   continue
+      // }
       let retries = 0;
       while (retries < MAX_RETRIES) {
         try {
@@ -317,8 +327,30 @@ async function getUniqElements(dirPath) {
   const dataRu = await parseJSONFile(fileRu[0].replace(/.json/g, ''));
   const dataUa = await parseJSONFile(fileUa[0].replace(/.json/g, ''));
 
-  // const dataRuUniq= getUniqObjByKey(dataRu, 'sku')
-  // const dataUaUniq = getUniqObjByKey(dataUa, 'sku')
+  // const findIdx=dataRu.findIndex(el=>el.sku==209390)
+  // dataRu.forEach((el,idx)=>{
+  //   if (idx<findIdx) {
+  //     el["Тип"]="Для смарт-часов"
+  //   } else {
+  //     el["Тип"]="Для фитнесбраслетов"
+      
+  //   }
+  // })
+  // dataUa.forEach((el,idx)=>{
+  //   if (idx<findIdx) {
+  //     el["Тип"]="Для смарт-годинників"
+  //   } else {
+  //     el["Тип"]="Для фітнесбраслетів"
+      
+  //   }
+  // })
+
+//   const dataRuUniq= getUniqObjByKey(dataRu, 'sku')
+//   const dataUaUniq = getUniqObjByKey(dataUa, 'sku')
+// console.log(dataRuUniq.length)
+// console.log(dataUaUniq.length)
+// await saveToJson('', fileRu, dataRu)
+// await saveToJson('', fileUa, dataUa)
 
   // const dataRuInterSection=dataRuUniq.filter(it=>uniqSku.includes(it.sku))
   // const dataUaInterSection=dataUaUniq.filter(it=>uniqSku.includes(it.sku))
@@ -399,7 +431,7 @@ async function getImages(dirPath) {
     console.log('error save resultJson getImages');
   }
 }
-// getImages(jsonFilesDir);
+//? getImages(jsonFilesDir);
 
 async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson, attrGroupJson) {
   const filesPath = await getFilesPath(dirPath);
@@ -510,7 +542,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
-await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
+//* await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   const filesPath = await getFilesPath(dirPath);
@@ -548,4 +580,4 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   console.log(resultsXlsxName, 'file has been created');
 }
 
-await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+//* await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
