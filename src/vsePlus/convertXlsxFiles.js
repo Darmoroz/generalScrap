@@ -9,10 +9,11 @@ async function main(xlsxDir) {
   for (let idxFiles = 0; idxFiles < files.length; idxFiles++) {
     const file = files[idxFiles];
     const jsFileData = await xlsxToJs(file);
-    // jsFileData.forEach(it => {
-    //   const applicab = it['Совместимые модели'];
-    //   it['Совместимые модели'] = removeDuplicateSubstrings(applicab);
-    // });
+    if (file.includes('ua.')) {
+      jsFileData.forEach(it=>{
+        it.imgCatalog=it.imgCatalog.split(';')
+      })
+    }
     await saveToJson('', file.replace('.xlsx', ''), jsFileData);
   }
 }

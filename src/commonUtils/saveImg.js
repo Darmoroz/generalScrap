@@ -11,6 +11,9 @@ export async function saveImg(url, path) {
       writer.on('error', reject);
     });
   } catch (error) {
-    throw new Error();
+    if (error.response.status === 404) {
+      return;
+    }
+    throw new Error(error);
   }
 }

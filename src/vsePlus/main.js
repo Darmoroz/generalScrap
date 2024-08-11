@@ -23,18 +23,20 @@ import {
 
 import { getFilesPath } from './utils/getFilesPath.js';
 import { CustomSet } from './utils/customSet.js';
+import { convertToCsvFull } from "./utils/convertToCsvFull.js";
 import { getUniqObjByKey } from './utils/getUniqObjByKey.js';
 
 // *
-const startCatIdx = 28;
+const startCatIdx = 30;
 
 const startPage = 1;
 const PER_PAGE = 24;
 const MAX_RETRIES = 5;
 const jsonFilesDir = 'data/products';
 const mainUrls = [BASE_URL_UA, BASE_URL_RU];
+// const mainUrls = [BASE_URL_UA];
 
-const startId = 101;
+const startId = 23740;
 const jsonToExcelDir = 'data/sheetsXlsx';
 // const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
 const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
@@ -46,7 +48,7 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
   const mainUrl = mainUrls[idxMainUrl];
 
   for (let idx = startCatIdx; idx < CATEGORIES.length; idx++) {
-    // for (let idx = startCatIdx; idx < 1; idx++) {
+    // for (let idx = startCatIdx; idx < 8; idx++) {
     const categoryUrl = CATEGORIES[idx];
     const category = mainUrl.includes('/ua')
       ? FILES_CAT[(idx + 1) * 2 - 1]
@@ -64,8 +66,8 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
   }
 }
 
-await getScondPartOfData(jsonFilesDir);
-await createExcelFileFromJson(jsonFilesDir);
+// await getScondPartOfData(jsonFilesDir);
+// await createExcelFileFromJson(jsonFilesDir);
 
 async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsFileName) {
   console.log(resultsFileName)
@@ -267,7 +269,6 @@ async function createExcelFileFromJson(dirPath) {
 async function fixFoo(dirPath) {
   const filesPathAll = await getFilesPath(dirPath);
   const filesPath = filesPathAll.filter(file => file.includes('.ua'));
-  console.log(filesPath.length);
   const results = [];
   for (let idx = 0; idx < filesPath.length; idx++) {
     const filePath = filesPath[idx];
@@ -277,6 +278,7 @@ async function fixFoo(dirPath) {
     } catch (err) {
       console.log('error parse json file', err);
     }
+
     // const noteProducts=products.filter(it=>it.note).map(({link, sku, note})=>({link, sku, note}));
 
     // products.forEach(it => {
@@ -293,12 +295,14 @@ async function fixFoo(dirPath) {
     //   console.log('error save resultJson SecondPart');
     // }
   }
+
+  // const uniqRes=getUniqObjByKey(results,'sku')
   try {
-    await saveToJson('', 'vsePlus_ua', results);
+    await saveToJson('', 'aksessuary-230-chehly-tel-ua.json', results);
   } catch (error) {
     console.log('error save resultJson SecondPart');
   }
-  console.log(results.length);
+  // console.log(uniqRes.length);
 }
 
 async function getUniqKeys(dirPath) {
@@ -319,14 +323,13 @@ async function getUniqKeys(dirPath) {
 // getUniqKeys(jsonFilesDir);
 
 async function getUniqElements(dirPath) {
+
   const filesPath = await getFilesPath(dirPath);
   // const uniqSku= await parseJSONFile('intersectionSku')
-
-  const fileRu = filesPath.filter(file => file.includes('ru'));
-  const fileUa = filesPath.filter(file => file.includes('ua'));
-  const dataRu = await parseJSONFile(fileRu[0].replace(/.json/g, ''));
-  const dataUa = await parseJSONFile(fileUa[0].replace(/.json/g, ''));
-
+  const fileRu = filesPath.filter(file => file.includes('_ru.'));
+  const fileUa = filesPath.filter(file => file.includes('_ua.'));
+  const dataRu = await parseJSONFile(fileRu[0]?.replace(/.json/g, ''));
+  const dataUa = await parseJSONFile(fileUa[0]?.replace(/.json/g, ''));
   // const findIdx=dataRu.findIndex(el=>el.sku==209390)
   // dataRu.forEach((el,idx)=>{
   //   if (idx<findIdx) {
@@ -337,32 +340,61 @@ async function getUniqElements(dirPath) {
   //   }
   // })
   // dataUa.forEach((el,idx)=>{
-  //   if (idx<findIdx) {
-  //     el["Тип"]="Для смарт-годинників"
-  //   } else {
-  //     el["Тип"]="Для фітнесбраслетів"
-      
-  //   }
-  // })
+    //   if (idx<findIdx) {
+      //     el["Тип"]="Для смарт-годинників"
+      //   } else {
+        //     el["Тип"]="Для фітнесбраслетів"
+        
+        //   }
+        // })
 
-//   const dataRuUniq= getUniqObjByKey(dataRu, 'sku')
-//   const dataUaUniq = getUniqObjByKey(dataUa, 'sku')
-// console.log(dataRuUniq.length)
-// console.log(dataUaUniq.length)
-// await saveToJson('', fileRu, dataRu)
-// await saveToJson('', fileUa, dataUa)
+        //!
+        // const rootRu=await parseJSONFile('data/products/accs_ru')
+        // const rootUa=await parseJSONFile('data/products/accs_ua')
+        // const ruKeys=new Set()
+        // const uaKeys=new Set()
+        // rootRu.forEach(el=>{
+        //   const keys=Object.keys(el)
+        //   keys.forEach(key=>{
+        //     if (!ruKeys.has(key)) {
+        //       ruKeys.add(key)
+        //     }
+        //   })
+        // })
+        // rootUa.forEach(el=>{
+        //   const keys=Object.keys(el)
+        //   keys.forEach(key=>{
+        //     if (!uaKeys.has(key)) {
+        //       uaKeys.add(key)
+        //     }
+        //   })
+        // })
+        // console.log('ru',[...ruKeys])
+        // console.log('ru',[...ruKeys].length)
+        // console.log('ua',[...uaKeys])
+        // console.log('ua',[...uaKeys].length)
+        // await saveToJson('','ruKeys', [...ruKeys])
+        // await saveToJson('','uaKeys', [...uaKeys])
 
-  // const dataRuInterSection=dataRuUniq.filter(it=>uniqSku.includes(it.sku))
-  // const dataUaInterSection=dataUaUniq.filter(it=>uniqSku.includes(it.sku))
+        const dataRuUniq= getUniqObjByKey(dataRu, 'sku')
+        const dataUaUniq = getUniqObjByKey(dataUa, 'sku')
+        const uniqSku=dataUaUniq.map(i=>i.sku)
+        
+        console.log(dataRuUniq.length)
+        console.log(dataUaUniq.length)
 
+        
+        const dataRuInterSection=dataRuUniq.filter(it=>uniqSku.includes(it.sku))
+          // await saveToJson('', 'accs_ru', dataRuInterSection)
+          // await saveToJson('', 'accs_ua', dataInterSectionUa)
+          
   // const ruUniq = new CustomSet(dataRu.map(el => el.sku));
   // const uaUniq = new CustomSet(dataUa.map(el => el.sku));
   // console.log('ru', ruUniq.size);
   // console.log('ua', uaUniq.size);
   // console.log(ruUniq.difference(uaUniq))
   // console.log(uaUniq.difference(ruUniq))
-  // await saveToJson('', 'vsePlus_ru',dataRuInterSection)
-  // await saveToJson('', 'vsePlus_ua', dataUaInterSection)
+
 }
 // getUniqElements(jsonFilesDir);
 
@@ -380,7 +412,7 @@ async function getImages(dirPath) {
     fs.mkdirSync(folderImgs);
   }
   const imgsDone = new Map();
-  let imgDoneIdx = 0;
+  let imgDoneIdx = 35545;
   for (let idx = 0; idx < dataUa.length; idx++) {
     // for (let idx = 0; idx < 10; idx++) {
     const it = dataUa[idx];
@@ -431,7 +463,7 @@ async function getImages(dirPath) {
     console.log('error save resultJson getImages');
   }
 }
-//? getImages(jsonFilesDir);
+// getImages(jsonFilesDir);
 
 async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson, attrGroupJson) {
   const filesPath = await getFilesPath(dirPath);
@@ -455,15 +487,20 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     it.ruInfo = finedRu;
     it.id = id;
     id++;
+    const categoryArr=[]
     const categorySplit = category.split('>');
-    const parentId = categoriesId.find(it => it.name_ua === categorySplit[0])?.category_id;
+    const parentId = categoriesId.find(it => it['name(uk-ua)'] === categorySplit[0])?.category_id;
+    categoryArr.push(parentId)
     if (categorySplit.length > 1) {
-      const catId = categoriesId.find(
-        it => it.name_ua === categorySplit[1] && it.parent_id === parentId
-      )?.category_id;
-      it.catId = `${parentId},${catId}`;
+      for (let idxSubCat = 1; idxSubCat < categorySplit.length; idxSubCat++) {
+        const el = categorySplit[idxSubCat];
+        const catId = categoriesId.find(
+          it => it['name(uk-ua)'] === el && it.parent_id === parentId
+        )?.category_id;
+        categoryArr.push(catId)
+      }
+      it.catId = categoryArr.join(',');
     } else {
-      it.catId = `${parentId},${catId}`;
       it.catError = 'true';
     }
 
@@ -476,9 +513,11 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     product['meta_title(uk-ua)'] = it?.title;
     product.categories = it.catId;
     product.sku = sku;
-    product.quantity = it['Наявність'] === 'В наявності' ? 50 : 0;
+    // product.quantity = it['Наявність'] === 'В наявності' ? 50 : 0;
+    product.quantity = it['Наявність на складі'] === 'Так' ? 50 : 0;
     product.model = sku;
     product.manufacturer = it['Виробник'];
+    // product.manufacturer = it.brand;
     product.image_name = it?.imgCatalog[0];
     product.price = it?.userPrice;
     products.push(product);
@@ -542,7 +581,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
-//* await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
+//  await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   const filesPath = await getFilesPath(dirPath);
@@ -580,4 +619,22 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   console.log(resultsXlsxName, 'file has been created');
 }
 
-//* await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+// await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+
+
+
+
+
+
+
+// const itemsNain= await parseJSONFile('data/products/accs_ua')
+// const itemsToCsv= convertToCsvFull(itemsNain)
+// new Promise((resolve,reject)=>{
+//   fs.writeFile('./accs_ua.csv', itemsToCsv, err=>{
+//     if (err) {
+//       reject(err)
+//     }
+//     console.log('file was save succesfully')
+//     resolve()
+//   })
+// })
