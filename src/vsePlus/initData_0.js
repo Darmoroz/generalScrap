@@ -43,6 +43,10 @@ export const CATEGORIES = [
   'mobilnye-telefony/89-bolty',
   'planshety/151-antenny', //151 та 176 в одному файлі
   'planshety/176-bolty',
+  'mobilnye-telefony/24-akkumulyatory/f-bf_1',
+  'mobilnye-telefony/7-displei/f-bf_1',
+  'mobilnye-telefony/18-korpusy/f-bf_1',
+  'mobilnye-telefony/79-platy/f-bf_1'
 ];
 
 export const FILES_CAT = [
@@ -116,6 +120,14 @@ export const FILES_CAT = [
   'Запчастини для планшетів>Інші деталі',
   'Запчасти для планшетов>Другие детали',
   'Запчастини для планшетів>Інші деталі',
+  'Запчасти для телефонов>Аккумуляторы',
+  'Запчастини для телефонів>Акумулятори',
+  'Запчасти для телефонов>Дисплеи',
+  'Запчастини для телефонів>Дисплеї',
+  'Запчасти для телефонов>Корпуса',
+  'Запчастини для телефонів>Корпуси',
+  'Запчасти для телефонов>Нижние платы',
+  'Запчастини для телефонів>Нижні плати',
 ];
 
 export const PRODUCT = {
