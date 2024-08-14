@@ -46,7 +46,9 @@ export const CATEGORIES = [
   'mobilnye-telefony/24-akkumulyatory/f-bf_1',
   'mobilnye-telefony/7-displei/f-bf_1',
   'mobilnye-telefony/18-korpusy/f-bf_1',
-  'mobilnye-telefony/79-platy/f-bf_1'
+  'mobilnye-telefony/79-platy/f-bf_1',
+  'mobilnye-telefony/7-displei/f-bf_1',
+  'planshety/127-displei/f-bf_1',
 ];
 
 export const FILES_CAT = [
@@ -128,6 +130,10 @@ export const FILES_CAT = [
   'Запчастини для телефонів>Корпуси',
   'Запчасти для телефонов>Нижние платы',
   'Запчастини для телефонів>Нижні плати',
+  'Запчасти для телефонов>Дисплеи',
+  'Запчастини для телефонів>Дисплеї',
+  'Запчасти для планшетов>Дисплеи',
+  'Запчастини для планшетів>Дисплеї',
 ];
 
 export const PRODUCT = {
