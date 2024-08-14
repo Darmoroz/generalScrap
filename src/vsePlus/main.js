@@ -27,7 +27,7 @@ import { convertToCsvFull } from "./utils/convertToCsvFull.js";
 import { getUniqObjByKey } from './utils/getUniqObjByKey.js';
 
 // *
-const startCatIdx = 30;
+const startCatIdx = 0;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -62,12 +62,12 @@ for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
       fileName = categoryUrl.replace(/\//g, '-').replace(/[<>:"\/\\|?*]/g, '_');
     }
     const jsonFileName = `${jsonFilesDir}/${fileName}-${lang}`;
-    // await getFirstPartOfData(page, mainUrl, categoryUrl, category, jsonFileName);
+    await getFirstPartOfData(page, mainUrl, categoryUrl, category, jsonFileName);
   }
 }
 
-// await getScondPartOfData(jsonFilesDir);
-// await createExcelFileFromJson(jsonFilesDir);
+await getScondPartOfData(jsonFilesDir);
+await createExcelFileFromJson(jsonFilesDir);
 
 async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsFileName) {
   console.log(resultsFileName)
