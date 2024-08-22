@@ -11,7 +11,7 @@ async function main(xlsxDir) {
     const jsFileData = await xlsxToJs(file);
     if (file.includes('ua.')) {
       jsFileData.forEach(it=>{
-        it.imgCatalog=it.imgCatalog.split(';')
+        it.imgCatalog=it.imgs.split(';')
       })
     }
     await saveToJson('', file.replace('.xlsx', ''), jsFileData);
