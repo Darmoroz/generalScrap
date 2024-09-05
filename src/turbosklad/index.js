@@ -65,14 +65,7 @@ async function getProductsLinks(categories, resultFileName) {
 
 // getProductsLinks(CATEGORIES, 'turboSkladLinks');
 
-const cookieJar = new tough.CookieJar();
-const client = wrapper(
-  axios.create({
-    jar: cookieJar,
-    withCredentials: true,
-  })
-);
-cookieJar.setCookieSync('site_lang=ru', 'https://turbosklad.com.ua');
+
 
 async function getFullInfoAboutProduct(jsonPath, resutFileName) {
   const productsObj = await parseJSONFile(jsonPath);
