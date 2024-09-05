@@ -9,11 +9,11 @@ async function main(xlsxDir) {
   for (let idxFiles = 0; idxFiles < files.length; idxFiles++) {
     const file = files[idxFiles];
     const jsFileData = await xlsxToJs(file);
-    if (file.includes('ua.')) {
-      jsFileData.forEach(it=>{
-        it.imgCatalog=it.imgs.split(';')
-      })
-    }
+    // if (file.includes('ua.')) {
+    //   jsFileData.forEach(it=>{
+    //     it.imgCatalog=it.imgs.split(';')
+    //   })
+    // }
     await saveToJson('', file.replace('.xlsx', ''), jsFileData);
   }
 }
