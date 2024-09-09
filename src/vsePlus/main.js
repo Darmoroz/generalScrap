@@ -616,7 +616,7 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
     console.log(resultsXlsxName, 'file has been created');
 }
 
-await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+// await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
 
 setTimeout(() => {
 const endTime = new Date();
@@ -651,8 +651,25 @@ function getUniqKeysFromArrOfObj(arr) {
 }
 
 
-async function tempFix(dirPath) {}
-await tempFix(jsonFilesDir);
+async function tempFix(dirPath) {
+  const items= await parseJSONFile('./data_1/products/accsVseplus_ua')
+  // const results=[]
+  // items.forEach(it=>{
+  //   if (it.category==='Аксесуари для гаджетів>Ремінці') {
+  //     const typeSplit=it["Тип"].split(',')[0].trim()
+  //     if (typeSplit==='Для смарт-годинників') {
+  //       it.category='Аксесуари для гаджетів>Ремінці>Для смарт-годинника'
+  //     }
+  //     if (typeSplit==='Для фітнесбраслетів') {
+  //       it.category='Аксесуари для гаджетів>Ремінці>Для фітнес-браслету'
+        
+  //     }
+  //   }
+  // })
+  // await saveToJson('', 'tempType', items)
+  console.log(items.length)
+}
+// await tempFix(jsonFilesDir);
 
 function readTxtFile(filePath) {
   return new Promise((resolve, reject) => {
