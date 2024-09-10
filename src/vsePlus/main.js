@@ -625,17 +625,6 @@ const timeDifference = (endTime - startTime) / 1000;
 console.log(`Час виконання: ${timeDifference} секунд`);
 }, 0);
 
-// const itemsNain= await parseJSONFile('data/products/accs_ua')
-// const itemsToCsv= convertToCsvFull(itemsNain)
-// new Promise((resolve,reject)=>{
-//   fs.writeFile('./accs_ua.csv', itemsToCsv, err=>{
-//     if (err) {
-//       reject(err)
-//     }
-//     console.log('file was save succesfully')
-//     resolve()
-//   })
-// })
 
 function getUniqKeysFromArrOfObj(arr) {
   const keys = new Set();
@@ -652,24 +641,17 @@ function getUniqKeysFromArrOfObj(arr) {
 
 
 async function tempFix(dirPath) {
-  const items= await parseJSONFile('./data_1/products/accsVseplus_ua')
-  // const results=[]
-  // items.forEach(it=>{
-  //   if (it.category==='Аксесуари для гаджетів>Ремінці') {
-  //     const typeSplit=it["Тип"].split(',')[0].trim()
-  //     if (typeSplit==='Для смарт-годинників') {
-  //       it.category='Аксесуари для гаджетів>Ремінці>Для смарт-годинника'
-  //     }
-  //     if (typeSplit==='Для фітнесбраслетів') {
-  //       it.category='Аксесуари для гаджетів>Ремінці>Для фітнес-браслету'
-        
-  //     }
-  //   }
-  // })
-  // await saveToJson('', 'tempType', items)
-  console.log(items.length)
+  const sku= await parseJSONFile('sku')
+    const wb = new excel.Workbook();
+    const ws = wb.addWorksheet('1');
+ sku.forEach((value, index) => {
+  ws.cell(index + 1, 1).string(value);
+});
+  
+    const outExcelFileName = `sku.xlsx`;
+    wb.write(outExcelFileName);
 }
-// await tempFix(jsonFilesDir);
+await tempFix(jsonFilesDir);
 
 function readTxtFile(filePath) {
   return new Promise((resolve, reject) => {
