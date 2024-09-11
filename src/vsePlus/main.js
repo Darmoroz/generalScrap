@@ -25,6 +25,7 @@ import { getFilesPath } from './utils/getFilesPath.js';
 import { CustomSet } from './utils/customSet.js';
 import { convertToCsvFull } from './utils/convertToCsvFull.js';
 import { getUniqObjByKey } from './utils/getUniqObjByKey.js';
+import { parse } from 'path';
 
 // *
 const startCatIdx = 0;
@@ -613,18 +614,17 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
     });
   }
   wb.write(resultsXlsxName);
-    console.log(resultsXlsxName, 'file has been created');
+  console.log(resultsXlsxName, 'file has been created');
 }
 
 // await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
 
 setTimeout(() => {
-const endTime = new Date();
-console.log(`Функція завершена: ${endTime.toLocaleString()}`);
-const timeDifference = (endTime - startTime) / 1000;
-console.log(`Час виконання: ${timeDifference} секунд`);
+  const endTime = new Date();
+  console.log(`Функція завершена: ${endTime.toLocaleString()}`);
+  const timeDifference = (endTime - startTime) / 1000;
+  console.log(`Час виконання: ${timeDifference} секунд`);
 }, 0);
-
 
 function getUniqKeysFromArrOfObj(arr) {
   const keys = new Set();
@@ -639,17 +639,7 @@ function getUniqKeysFromArrOfObj(arr) {
   return [...keys];
 }
 
-
 async function tempFix(dirPath) {
-  const sku= await parseJSONFile('sku')
-    const wb = new excel.Workbook();
-    const ws = wb.addWorksheet('1');
- sku.forEach((value, index) => {
-  ws.cell(index + 1, 1).string(value);
-});
-  
-    const outExcelFileName = `sku.xlsx`;
-    wb.write(outExcelFileName);
 }
 await tempFix(jsonFilesDir);
 
