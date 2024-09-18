@@ -27,8 +27,10 @@ import { convertToCsvFull } from './utils/convertToCsvFull.js';
 import { getUniqObjByKey } from './utils/getUniqObjByKey.js';
 import { parse } from 'path';
 
+const startTime = new Date();
+console.log(`Функція запущена: ${startTime.toLocaleString()}`);
 // *
-const startCatIdx = 0;
+const startCategoryIdx = 30;
 
 const startPage = 1;
 const PER_PAGE = 24;
@@ -40,16 +42,16 @@ const mainUrls = [BASE_URL_UA, BASE_URL_RU];
 const startId = 24778;
 const jsonToExcelDir = 'data/sheetsXlsx';
 // const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
-const resultsXlsxFile = 'productsАccessoriesTexaks.xlsx';
+// const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
+const resultsXlsxFile = 'productsToolsTexaks.xlsx';
 const categoriesIdJson = 'data/categoriesId';
 const attrJson = 'data/attributesId';
 const attrGroupJson = 'data/attributesGroupId';
 
 for (let idxMainUrl = 0; idxMainUrl < mainUrls.length; idxMainUrl++) {
   const mainUrl = mainUrls[idxMainUrl];
-
-  for (let idx = startCatIdx; idx < CATEGORIES.length; idx++) {
-    // for (let idx = startCatIdx; idx < 8; idx++) {
+  for (let idx = startCategoryIdx; idx < CATEGORIES.length; idx++) {
+    // for (let idx = startCategoryIdx; idx < 8; idx++) {
     const categoryUrl = CATEGORIES[idx];
     const category = mainUrl.includes('/ua')
       ? FILES_CAT[(idx + 1) * 2 - 1]
@@ -109,7 +111,6 @@ async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsF
             const key = cur.title;
             const value = cur?.textContent;
             acc[key] = acc[key] ? [...acc[key], value] : (acc[key] = [value]);
-
             return acc;
           },
           {}
@@ -117,19 +118,19 @@ async function getFirstPartOfData(page, baseUrl, categoryUrl, category, resultsF
         Object.keys(spec).forEach(key => {
           spec[key] = spec[key].join(', ');
         });
-        // const note=el.querySelector('.card-product__text_note')?.textContent
-        return { link, category, sku, title, price, prevImg, ...spec };
+        const note = el.querySelector('.card-product__text_note')?.textContent;
+        return { link, category, sku, title, price, prevImg, note, ...spec };
       });
       if (products.length !== PER_PAGE) {
         if (page === lastPage) {
           results.push(...products);
-          console.log('total items', results.length - 1);
+          console.log('total items', results.length);
           break;
         }
         continue;
       }
       results.push(...products);
-      console.log('total items', results.length - 1);
+      console.log('total items', results.length);
       page++;
       if (page > lastPage) {
         break;
@@ -173,7 +174,7 @@ async function getScondPartOfData(dirPath) {
           const infoProduct = [...document.querySelectorAll('script[type="application/ld+json"]')]
             .map(i => JSON.parse(i.textContent))
             .find(i => i['@type'] === 'Product');
-          product.brand = infoProduct?.brand?.name;
+          product.manufacturer = infoProduct?.brand?.name;
 
           const imgs = infoProduct?.image;
           if (Array.isArray(imgs)) {
@@ -184,11 +185,29 @@ async function getScondPartOfData(dirPath) {
           product.description = normalizeStr(
             document.querySelector('.product__block.text-base>p')?.textContent
           );
-          const prodSpec = infoProduct.description?.split('. ');
+          const regexSplit = /\. (?=[А-Я])/g;
+          const prodSpec = infoProduct.description?.split(regexSplit);
+          let lastIdx = false;
           prodSpec.forEach(it => {
+            if (lastIdx) {
+              return;
+            }
             const splitIt = it.split(': ');
             const key = splitIt?.[0];
-            const value = it.replace(`${key}:`, '').trim();
+
+            const value = it.replaceAll(`${key}:`, '').trim();
+            if (value.includes('|')) {
+              const splitValue = value.split('|');
+              splitValue.forEach(val => {
+                const splitVal = val.split(':');
+                const keyVal = splitVal[0]?.trim();
+                const valu = splitVal[1]?.trim();
+                if (!product[keyVal]) {
+                  product[keyVal] = valu;
+                }
+              });
+            }
+
             if (!product[key]) {
               product[key] = value;
             } else {
@@ -196,6 +215,9 @@ async function getScondPartOfData(dirPath) {
               productKeySplit.push(value);
               const uniqValue = [...new Set(productKeySplit)].join(', ');
               product[key] = uniqValue;
+            }
+            if (key === 'Примітка' || key === 'Примечание') {
+              lastIdx = true;
             }
           });
           product.userSKU = `1${sku}`;
@@ -234,8 +256,8 @@ async function createExcelFileFromJson(dirPath) {
     products.forEach(it => {
       delete it.link;
       delete it.description;
-      delete it['Примечание'];
-      delete it['Примітка'];
+      // delete it['Примечание'];
+      // delete it['Примітка'];
     });
     const splitFilePath = filePath.replace(/.json/g, '').split('\\');
     const wb = new excel.Workbook();
@@ -266,38 +288,6 @@ async function createExcelFileFromJson(dirPath) {
     console.log('Excel file has been created');
   }
 }
-
-async function fixFoo(dirPath) {
-  const filesPathAll = await getFilesPath(dirPath);
-  for (let idx = 0; idx < filesPathAll.length; idx++) {
-    // for (let idx = 0; idx < 1; idx++) {
-    const filePath = filesPathAll[idx];
-    try {
-      const products = await parseJSONFile(filePath.replace(/.json/g, ''));
-      const uniqKeys = getUniqKeysFromArrOfObj(products);
-
-      for (let idxProd = 0; idxProd < products.length; idxProd++) {
-        // for (let idxProd = 0; idxProd < 2; idxProd++) {
-        const product = products[idxProd];
-        const prodKeys = Object.keys(product);
-        const keysToAdd = uniqKeys.filter(key => !prodKeys.includes(key));
-        keysToAdd.forEach(addKey => {
-          product[addKey] = '';
-        });
-      }
-      const splitFilePath = filePath.split('\\');
-      const resultFileName = splitFilePath[splitFilePath.length - 1];
-      try {
-        await saveToJson('', resultFileName.replace(/.json/g, ''), products);
-      } catch (error) {
-        console.log('error save resultJson SecondPart');
-      }
-    } catch (err) {
-      console.log('error parse json file', err);
-    }
-  }
-}
-// fixFoo(jsonFilesDir);
 
 async function getImgsFix(dirPath) {
   const filesPath = await getFilesPath(dirPath);
@@ -363,29 +353,6 @@ async function getImgsFix(dirPath) {
   }
 }
 // getImgsFix(jsonFilesDir);
-
-async function getUniqElements(dirPath) {
-  const filesPath = await getFilesPath(dirPath);
-  const fileRu = filesPath.filter(file => file.includes('_ru.'));
-  const fileUa = filesPath.filter(file => file.includes('_ua.'));
-  const dataRu = await parseJSONFile(fileRu[0]?.replace(/.json/g, ''));
-  const dataUa = await parseJSONFile(fileUa[0]?.replace(/.json/g, ''));
-  //! порівння двох масивів обєктів за ключем userSKU по довжині
-  const dataRuUniq = getUniqObjByKey(dataRu, 'userSKU');
-  const dataUaUniq = getUniqObjByKey(dataUa, 'userSKU');
-  const uniqSkuUa = dataUaUniq.map(i => i.userSKU);
-  const dataRuInterSection = dataRuUniq.filter(it => uniqSkuUa.includes(it.userSKU));
-  console.log(uniqSkuUa.length);
-  console.log(dataRuInterSection.length);
-  //! порівняння двох масивів між собою. Пошук едементів, що не співпали.
-  const ruUniq = new CustomSet(dataRu.map(el => el.userSKU));
-  const uaUniq = new CustomSet(dataUa.map(el => el.userSKU));
-  console.log('ru', ruUniq.size);
-  console.log('ua', uaUniq.size);
-  console.log(ruUniq.difference(uaUniq));
-  console.log(uaUniq.difference(ruUniq));
-}
-// getUniqElements(jsonFilesDir);
 
 async function getImages(dirPath) {
   const filesPath = await getFilesPath(dirPath);
@@ -576,9 +543,6 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
-const startTime = new Date();
-console.log(`Функція запущена: ${startTime.toLocaleString()}`);
-
 //  await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
@@ -616,15 +580,62 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   wb.write(resultsXlsxName);
   console.log(resultsXlsxName, 'file has been created');
 }
-
 // await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
 
-setTimeout(() => {
-  const endTime = new Date();
-  console.log(`Функція завершена: ${endTime.toLocaleString()}`);
-  const timeDifference = (endTime - startTime) / 1000;
-  console.log(`Час виконання: ${timeDifference} секунд`);
-}, 0);
+async function addAllKeysToObj(dirPath) {
+  const filesPathAll = await getFilesPath(dirPath);
+  for (let idx = 0; idx < filesPathAll.length; idx++) {
+    // for (let idx = 0; idx < 1; idx++) {
+    const filePath = filesPathAll[idx];
+    try {
+      const products = await parseJSONFile(filePath.replace(/.json/g, ''));
+      const uniqKeys = getUniqKeysFromArrOfObj(products);
+
+      for (let idxProd = 0; idxProd < products.length; idxProd++) {
+        // for (let idxProd = 0; idxProd < 2; idxProd++) {
+        const product = products[idxProd];
+        const prodKeys = Object.keys(product);
+        const keysToAdd = uniqKeys.filter(key => !prodKeys.includes(key));
+        keysToAdd.forEach(addKey => {
+          product[addKey] = '';
+        });
+      }
+      const splitFilePath = filePath.split('\\');
+      const resultFileName = splitFilePath[splitFilePath.length - 1];
+      try {
+        await saveToJson('', resultFileName.replace(/.json/g, ''), products);
+      } catch (error) {
+        console.log('error save resultJson SecondPart');
+      }
+    } catch (err) {
+      console.log('error parse json file', err);
+    }
+  }
+}
+//await addAllKeysToObj(jsonFilesDir);
+
+async function getUniqElements(dirPath) {
+  const filesPath = await getFilesPath(dirPath);
+  const fileRu = filesPath.filter(file => file.includes('_ru.'));
+  const fileUa = filesPath.filter(file => file.includes('_ua.'));
+  const dataRu = await parseJSONFile(fileRu[0]?.replace(/.json/g, ''));
+  const dataUa = await parseJSONFile(fileUa[0]?.replace(/.json/g, ''));
+  //! порівння двох масивів обєктів за ключем userSKU по довжині
+  const dataRuUniq = getUniqObjByKey(dataRu, 'userSKU');
+  const dataUaUniq = getUniqObjByKey(dataUa, 'userSKU');
+  const uniqSkuUa = dataUaUniq.map(i => i.userSKU);
+  const dataRuInterSection = dataRuUniq.filter(it => uniqSkuUa.includes(it.userSKU));
+  console.log(uniqSkuUa.length);
+  console.log(dataRuInterSection.length);
+  //! порівняння двох масивів між собою. Пошук едементів, що не співпали.
+  const ruUniq = new CustomSet(dataRu.map(el => el.userSKU));
+  const uaUniq = new CustomSet(dataUa.map(el => el.userSKU));
+  console.log('ru', ruUniq.size);
+  console.log('ua', uaUniq.size);
+  console.log(ruUniq.difference(uaUniq));
+  console.log(uaUniq.difference(ruUniq));
+}
+//await getUniqElements(jsonFilesDir);
 
 function getUniqKeysFromArrOfObj(arr) {
   const keys = new Set();
@@ -639,10 +650,6 @@ function getUniqKeysFromArrOfObj(arr) {
   return [...keys];
 }
 
-async function tempFix(dirPath) {
-}
-await tempFix(jsonFilesDir);
-
 function readTxtFile(filePath) {
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf8', (err, data) => {
@@ -654,3 +661,11 @@ function readTxtFile(filePath) {
     });
   });
 }
+
+async function tempFix(dirPath) {}
+await tempFix(jsonFilesDir);
+
+const endTime = new Date();
+console.log(`Функція завершена: ${endTime.toLocaleString()}`);
+const timeDifference = (endTime - startTime) / 1000;
+console.log(`Час виконання: ${timeDifference} секунд`);

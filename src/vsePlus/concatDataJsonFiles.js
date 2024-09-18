@@ -2,11 +2,14 @@ import { getFilesPathFromDirectory } from '../commonUtils/getFilesPathFromDirect
 import { parseJSONFile } from '../commonUtils/parseJSONFile.js';
 import { saveToJson } from '../commonUtils/saveToJson.js';
 
-const folderPath = 'data/products';
-const resultFileName = 'resHun';
+// const folderPath = 'data/products';
+const folderPath = 'xlsx';
+const resultFileName = 'tools_ru';
 
 async function main(initFolderPath, resultFileName) {
-  const filesPath = await getFilesPathFromDirectory(initFolderPath);
+  const filesPathAll = await getFilesPathFromDirectory(initFolderPath);
+  const filesPath= filesPathAll.filter(it=>it.includes('-ru'))
+console.log(filesPath.length)
   const results = [];
   for (let idx = 0; idx < filesPath.length; idx++) {
     const filepath = filesPath[idx];
