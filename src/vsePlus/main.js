@@ -39,7 +39,7 @@ const jsonFilesDir = 'data/products';
 const mainUrls = [BASE_URL_UA, BASE_URL_RU];
 // const mainUrls = [BASE_URL_UA];
 
-const startId = 24778;
+const startId = 69090;
 const jsonToExcelDir = 'data/sheetsXlsx';
 // const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
 // const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
@@ -356,19 +356,20 @@ async function getImgsFix(dirPath) {
 
 async function getImages(dirPath) {
   const filesPath = await getFilesPath(dirPath);
+  const errorAr=[]
   const imgsFilesFull = await getFilesPath('images');
   const imgsFiles = imgsFilesFull.map(it => {
     const split = it.split('\\');
     return split[split.length - 1];
   });
-  const fileUa = filesPath.filter(file => file.includes('ua'));
-  const dataUa = await parseJSONFile(fileUa[0].replace(/.json/g, ''));
+  const fileUa = filesPath.find(file => file.includes('_ua.'));
+  const dataUa = await parseJSONFile(fileUa.replace(/.json/g, ''));
   const folderImgs = 'images/';
   if (!fs.existsSync(folderImgs)) {
     fs.mkdirSync(folderImgs);
   }
   const imgsDone = new Map();
-  let imgDoneIdx = 35545;
+  let imgDoneIdx = 251;
   for (let idx = 0; idx < dataUa.length; idx++) {
     // for (let idx = 0; idx < 10; idx++) {
     const it = dataUa[idx];
@@ -399,6 +400,7 @@ async function getImages(dirPath) {
           imgDoneIdx++;
           idxImgs++;
         } catch (error) {
+          errorAr.push(imgLink)
           console.log(error);
         }
       } else {
@@ -415,11 +417,12 @@ async function getImages(dirPath) {
   console.log('total imgs', imgDoneIdx);
   try {
     await saveToJson('./', 'abra', dataUa);
+    await saveToJson('./', 'errorImgsLinks', errorAr);
   } catch (error) {
     console.log('error save resultJson getImages');
   }
 }
-// getImages(jsonFilesDir);
+// await getImages(jsonFilesDir);
 
 async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson, attrGroupJson) {
   const filesPath = await getFilesPath(dirPath);
@@ -463,7 +466,8 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     } else {
       it.catId = 'error';
     }
-    const imgsCinvertToArr = it?.imgCatalog?.split(';');
+    // const imgsCinvertToArr = it?.imgCatalog?.split(';');
+    const imgsCinvertToArr = it?.imgCatalog
     //*створюємо дані для листа Excel Products
     const product = { ...PRODUCT };
     product.product_id = it.id;
@@ -543,7 +547,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
-//  await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
+ await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   const filesPath = await getFilesPath(dirPath);
@@ -580,7 +584,7 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   wb.write(resultsXlsxName);
   console.log(resultsXlsxName, 'file has been created');
 }
-// await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
 
 async function addAllKeysToObj(dirPath) {
   const filesPathAll = await getFilesPath(dirPath);
@@ -620,9 +624,13 @@ async function getUniqElements(dirPath) {
   const fileUa = filesPath.filter(file => file.includes('_ua.'));
   const dataRu = await parseJSONFile(fileRu[0]?.replace(/.json/g, ''));
   const dataUa = await parseJSONFile(fileUa[0]?.replace(/.json/g, ''));
+console.log(dataRu.length)
+console.log(dataUa.length)
   //! порівння двох масивів обєктів за ключем userSKU по довжині
   const dataRuUniq = getUniqObjByKey(dataRu, 'userSKU');
   const dataUaUniq = getUniqObjByKey(dataUa, 'userSKU');
+  // await saveToJson('','tools_ua',dataUaUniq)
+  // await saveToJson('','tools_ru',dataRuUniq)
   const uniqSkuUa = dataUaUniq.map(i => i.userSKU);
   const dataRuInterSection = dataRuUniq.filter(it => uniqSkuUa.includes(it.userSKU));
   console.log(uniqSkuUa.length);
@@ -635,7 +643,7 @@ async function getUniqElements(dirPath) {
   console.log(ruUniq.difference(uaUniq));
   console.log(uaUniq.difference(ruUniq));
 }
-//await getUniqElements(jsonFilesDir);
+// await getUniqElements(jsonFilesDir);
 
 function getUniqKeysFromArrOfObj(arr) {
   const keys = new Set();
