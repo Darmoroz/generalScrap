@@ -298,7 +298,7 @@ async function getImgsFix(dirPath) {
   });
   console.log('total done imgs', imagesName.length);
   let imgIdx = 0;
-  const folderImgs = 'imgs/';
+  const folderImgs = 'images/';
   if (!fs.existsSync(folderImgs)) {
     fs.mkdirSync(folderImgs);
   }
@@ -310,9 +310,10 @@ async function getImgsFix(dirPath) {
     const filePath = filesPath[idx];
     const products = await parseJSONFile(filePath.replace(/.json/g, ''));
     for (let idxProd = 0; idxProd < products.length; idxProd++) {
+    // for (let idxProd = 0; idxProd < 2; idxProd++) {
+      const modifyImgsArr = [];
       const product = products[idxProd];
       const imgsArr = product.imgs.split(';');
-      const modifyImgsArr = [];
       for (let idxImgs = 0; idxImgs < imgsArr.length; idxImgs++) {
         const imgLink = imgsArr[idxImgs];
         if (!imgLink) {
@@ -322,41 +323,47 @@ async function getImgsFix(dirPath) {
         }
         const imgLinkSplit = imgLink.split('/');
         const imgName = imgLinkSplit[imgLinkSplit.length - 1];
-        const isImgDone = imagesName.find(img => img.includes(imgName));
+        const isImgDone = imagesName.find(img => {
+          const imgSplit = img.split('_');
+          const lastImgName = imgSplit[imgSplit.length - 1];
+          return lastImgName === imgName;
+        });
         if (isImgDone) {
           const updatePath = `catalog/products/${isImgDone}`;
           modifyImgsArr.push(updatePath);
           continue;
         }
-        const downloadImgName = `img_${imgIdx}_${imgName}`;
-        const updateDownloadImgName = `catalog/products/${downloadImgName}`;
-        const imgPath = folderImgs + downloadImgName;
-        try {
-          await saveImg(imgLink, imgPath);
-          modifyImgsArr.push(updateDownloadImgName);
-          imgIdx++;
-        } catch (error) {
-          console.log('download img error');
-          downloadImgError.push(imgLink);
-          continue;
-        }
+        //       const downloadImgName = `img_${imgIdx}_${imgName}`;
+        //       const updateDownloadImgName = `catalog/products/${downloadImgName}`;
+        //       const imgPath = folderImgs + downloadImgName;
+        //       try {
+        //         await saveImg(imgLink, imgPath);
+        //         modifyImgsArr.push(updateDownloadImgName);
+        //         imgIdx++;
+        //       } catch (error) {
+        //         console.log('download img error');
+        //         downloadImgError.push(imgLink);
+        //         continue;
+        //       }
       }
       product.imgCatalog = modifyImgsArr;
-      totalImgsArr.push(...imgsArr);
-      console.log('done idx->', idxProd);
+      //     totalImgsArr.push(...imgsArr);
+      //     console.log('done idx->', idxProd);
     }
-    await saveToJson('', filePath.replace(/.json/g, ''), products);
+    //   await saveToJson('', filePath.replace(/.json/g, ''), products);
+    await saveToJson('', 'display_ua', products);
 
-    console.log('total uniq img', [...new Set(totalImgsArr)].length);
-    console.log('total imgs', totalImgsArr.length);
-    await saveToJson('', 'errorLink', downloadImgError);
+    //   console.log('total uniq img', [...new Set(totalImgsArr)].length);
+    //   console.log('total imgs', totalImgsArr.length);
+    //   await saveToJson('', 'errorLink', downloadImgError);
   }
+  console.log(imgIdx)
 }
-// getImgsFix(jsonFilesDir);
+// await getImgsFix(jsonFilesDir);
 
 async function getImages(dirPath) {
   const filesPath = await getFilesPath(dirPath);
-  const errorAr=[]
+  const errorAr = [];
   const imgsFilesFull = await getFilesPath('images');
   const imgsFiles = imgsFilesFull.map(it => {
     const split = it.split('\\');
@@ -400,7 +407,7 @@ async function getImages(dirPath) {
           imgDoneIdx++;
           idxImgs++;
         } catch (error) {
-          errorAr.push(imgLink)
+          errorAr.push(imgLink);
           console.log(error);
         }
       } else {
@@ -467,7 +474,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
       it.catId = 'error';
     }
     // const imgsCinvertToArr = it?.imgCatalog?.split(';');
-    const imgsCinvertToArr = it?.imgCatalog
+    const imgsCinvertToArr = it?.imgCatalog;
     //*створюємо дані для листа Excel Products
     const product = { ...PRODUCT };
     product.product_id = it.id;
@@ -547,7 +554,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
- await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
+//  await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   const filesPath = await getFilesPath(dirPath);
@@ -584,7 +591,7 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   wb.write(resultsXlsxName);
   console.log(resultsXlsxName, 'file has been created');
 }
-await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+// await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
 
 async function addAllKeysToObj(dirPath) {
   const filesPathAll = await getFilesPath(dirPath);
@@ -624,8 +631,8 @@ async function getUniqElements(dirPath) {
   const fileUa = filesPath.filter(file => file.includes('_ua.'));
   const dataRu = await parseJSONFile(fileRu[0]?.replace(/.json/g, ''));
   const dataUa = await parseJSONFile(fileUa[0]?.replace(/.json/g, ''));
-console.log(dataRu.length)
-console.log(dataUa.length)
+  console.log('data_ua items', dataUa.length);
+  console.log('data_ru items', dataRu.length);
   //! порівння двох масивів обєктів за ключем userSKU по довжині
   const dataRuUniq = getUniqObjByKey(dataRu, 'userSKU');
   const dataUaUniq = getUniqObjByKey(dataUa, 'userSKU');
@@ -633,13 +640,13 @@ console.log(dataUa.length)
   // await saveToJson('','tools_ru',dataRuUniq)
   const uniqSkuUa = dataUaUniq.map(i => i.userSKU);
   const dataRuInterSection = dataRuUniq.filter(it => uniqSkuUa.includes(it.userSKU));
-  console.log(uniqSkuUa.length);
-  console.log(dataRuInterSection.length);
+  console.log('data_ua uniq by sku items', uniqSkuUa.length);
+  console.log('data_ru uniq by sku items', dataRuInterSection.length);
   //! порівняння двох масивів між собою. Пошук едементів, що не співпали.
   const ruUniq = new CustomSet(dataRu.map(el => el.userSKU));
   const uaUniq = new CustomSet(dataUa.map(el => el.userSKU));
-  console.log('ru', ruUniq.size);
-  console.log('ua', uaUniq.size);
+  console.log('ua uniq', uaUniq.size);
+  console.log('ru uniq', ruUniq.size);
   console.log(ruUniq.difference(uaUniq));
   console.log(uaUniq.difference(ruUniq));
 }
