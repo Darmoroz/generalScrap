@@ -39,11 +39,11 @@ const jsonFilesDir = 'data/products';
 const mainUrls = [BASE_URL_UA, BASE_URL_RU];
 // const mainUrls = [BASE_URL_UA];
 
-const startId = 69090;
+const startId = 72233;
 const jsonToExcelDir = 'data/sheetsXlsx';
 // const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
 // const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
-const resultsXlsxFile = 'productsToolsTexaks.xlsx';
+const resultsXlsxFile = 'productsObladTexaks.xlsx';
 const categoriesIdJson = 'data/categoriesId';
 const attrJson = 'data/attributesId';
 const attrGroupJson = 'data/attributesGroupId';
@@ -376,7 +376,7 @@ async function getImages(dirPath) {
     fs.mkdirSync(folderImgs);
   }
   const imgsDone = new Map();
-  let imgDoneIdx = 251;
+  let imgDoneIdx = 3967;
   for (let idx = 0; idx < dataUa.length; idx++) {
     // for (let idx = 0; idx < 10; idx++) {
     const it = dataUa[idx];
@@ -386,6 +386,7 @@ async function getImages(dirPath) {
     while (idxImgs < images.length) {
       const imgLink = images[idxImgs];
       if (!imgLink) {
+        newImgs.push('catalog/products/prod_no_image.jpg')
         idxImgs++;
         continue;
       }
@@ -423,7 +424,7 @@ async function getImages(dirPath) {
   }
   console.log('total imgs', imgDoneIdx);
   try {
-    await saveToJson('./', 'abra', dataUa);
+    await saveToJson('./', 'oblad_ua', dataUa);
     await saveToJson('./', 'errorImgsLinks', errorAr);
   } catch (error) {
     console.log('error save resultJson getImages');
@@ -554,7 +555,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
-//  await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
+ await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   const filesPath = await getFilesPath(dirPath);
@@ -591,7 +592,7 @@ async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   wb.write(resultsXlsxName);
   console.log(resultsXlsxName, 'file has been created');
 }
-// await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
+await createExcelManySheetsFromJsonFiles(jsonToExcelDir, resultsXlsxFile);
 
 async function addAllKeysToObj(dirPath) {
   const filesPathAll = await getFilesPath(dirPath);
