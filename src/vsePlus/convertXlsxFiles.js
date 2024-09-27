@@ -1,8 +1,9 @@
 import { saveToJson } from '../commonUtils/saveToJson.js';
 import { xlsxToJs } from './utils/xlsxToJs.js';
 import { getFilesPath } from './utils/getFilesPath.js';
+import path from 'path';
 
-const XLSX_DIR = 'xlsx';
+const XLSX_DIR = path.resolve('xlsx');
 
 async function main(xlsxDir) {
   const filesAll = await getFilesPath(xlsxDir);
