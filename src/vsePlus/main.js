@@ -43,6 +43,7 @@ const startId = 74608;
 const jsonToExcelDir = 'data/sheetsXlsx';
 // const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
 // const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
+// const resultsXlsxFile = 'productsObladTexaks.xlsx';
 const resultsXlsxFile = 'productsMaterialsTexaks.xlsx';
 const categoriesIdJson = 'data/categoriesId';
 const attrJson = 'data/attributesId';
