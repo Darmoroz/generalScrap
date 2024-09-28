@@ -4,12 +4,12 @@ import { saveToJson } from '../commonUtils/saveToJson.js';
 
 // const folderPath = 'data/products';
 const folderPath = 'xlsx';
-const resultFileName = 'tools_ua';
+const resultFileName = 'materials_ru';
 
 async function main(initFolderPath, resultFileName) {
   const filesPathAll = await getFilesPathFromDirectory(initFolderPath);
-  const filesPath= filesPathAll.filter(it=>it.includes('-ua'))
-console.log(filesPath.length)
+  const filesPath = filesPathAll.filter(it => it.includes('-ru'));
+  console.log(filesPath.length);
   const results = [];
   for (let idx = 0; idx < filesPath.length; idx++) {
     const filepath = filesPath[idx];

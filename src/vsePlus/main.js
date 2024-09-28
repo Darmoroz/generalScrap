@@ -39,11 +39,11 @@ const jsonFilesDir = 'data/products';
 const mainUrls = [BASE_URL_UA, BASE_URL_RU];
 // const mainUrls = [BASE_URL_UA];
 
-const startId = 72233;
+const startId = 74608;
 const jsonToExcelDir = 'data/sheetsXlsx';
 // const resultsXlsxFile='productsCatTelPlanshTexaks.xlsx'
 // const resultsXlsxFile='productsАccessoriesTexaks.xlsx'
-const resultsXlsxFile = 'productsObladTexaks.xlsx';
+const resultsXlsxFile = 'productsMaterialsTexaks.xlsx';
 const categoriesIdJson = 'data/categoriesId';
 const attrJson = 'data/attributesId';
 const attrGroupJson = 'data/attributesGroupId';
@@ -310,7 +310,7 @@ async function getImgsFix(dirPath) {
     const filePath = filesPath[idx];
     const products = await parseJSONFile(filePath.replace(/.json/g, ''));
     for (let idxProd = 0; idxProd < products.length; idxProd++) {
-    // for (let idxProd = 0; idxProd < 2; idxProd++) {
+      // for (let idxProd = 0; idxProd < 2; idxProd++) {
       const modifyImgsArr = [];
       const product = products[idxProd];
       const imgsArr = product.imgs.split(';');
@@ -357,7 +357,7 @@ async function getImgsFix(dirPath) {
     //   console.log('total imgs', totalImgsArr.length);
     //   await saveToJson('', 'errorLink', downloadImgError);
   }
-  console.log(imgIdx)
+  console.log(imgIdx);
 }
 // await getImgsFix(jsonFilesDir);
 
@@ -376,7 +376,7 @@ async function getImages(dirPath) {
     fs.mkdirSync(folderImgs);
   }
   const imgsDone = new Map();
-  let imgDoneIdx = 3967;
+  let imgDoneIdx = 200;
   for (let idx = 0; idx < dataUa.length; idx++) {
     // for (let idx = 0; idx < 10; idx++) {
     const it = dataUa[idx];
@@ -386,7 +386,7 @@ async function getImages(dirPath) {
     while (idxImgs < images.length) {
       const imgLink = images[idxImgs];
       if (!imgLink) {
-        newImgs.push('catalog/products/prod_no_image.jpg')
+        newImgs.push('catalog/products/prod_no_image.jpg');
         idxImgs++;
         continue;
       }
@@ -555,7 +555,7 @@ async function createImportFullFiles(dirPath, startId, categoriesJson, attrJson,
     console.log('error save AdditionalImages');
   }
 }
- await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
+await createImportFullFiles(jsonFilesDir, startId, categoriesIdJson, attrJson, attrGroupJson);
 
 async function createExcelManySheetsFromJsonFiles(dirPath, resultsXlsxName) {
   const filesPath = await getFilesPath(dirPath);
@@ -637,8 +637,8 @@ async function getUniqElements(dirPath) {
   //! порівння двох масивів обєктів за ключем userSKU по довжині
   const dataRuUniq = getUniqObjByKey(dataRu, 'userSKU');
   const dataUaUniq = getUniqObjByKey(dataUa, 'userSKU');
-  // await saveToJson('','tools_ua',dataUaUniq)
-  // await saveToJson('','tools_ru',dataRuUniq)
+  // await saveToJson('','materials_ua',dataUaUniq)
+  // await saveToJson('','materials_ru',dataRuUniq)
   const uniqSkuUa = dataUaUniq.map(i => i.userSKU);
   const dataRuInterSection = dataRuUniq.filter(it => uniqSkuUa.includes(it.userSKU));
   console.log('data_ua uniq by sku items', uniqSkuUa.length);
